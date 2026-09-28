@@ -78,7 +78,7 @@ class AuthService {
       final response = await ApiService.post('/auth/loginuser', {
         'email': email,
         'senha': senha,
-      });
+      }, limparSessaoAo401: false);
 
       if (response.statusCode == 401) {
         throw const AuthException('E-mail ou senha inválidos.');
