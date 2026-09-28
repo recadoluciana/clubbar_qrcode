@@ -22,8 +22,9 @@ class ApiService {
 
   static Future<http.Response> post(
     String endpoint,
-    Map<String, dynamic> body,
-  ) async {
+    Map<String, dynamic> body, {
+    bool limparSessaoAo401 = true,
+  }) async {
     final url = Uri.parse('${ApiConfig.baseUrl}$endpoint');
 
     final response = await http.post(
@@ -31,7 +32,10 @@ class ApiService {
       headers: await _headers(),
       body: jsonEncode(body),
     );
-    return _tratarRespostaDeAutenticacao(response);
+    return _tratarRespostaDeAutenticacao(
+      response,
+      limparSessaoAo401: limparSessaoAo401,
+    );
   }
 
   static Future<http.Response> put(String endpoint, Object body) async {
@@ -66,9 +70,10 @@ class ApiService {
   /// Remove dados locais quando a API informa que a sessão não é mais válida.
   /// O app observa essa alteração e retorna o usuário à tela de login.
   static Future<http.Response> _tratarRespostaDeAutenticacao(
-    http.Response response,
-  ) async {
-    if (response.statusCode == 401) {
+    http.Response response, {
+    bool limparSessaoAo401 = true,
+  }) async {
+    if (limparSessaoAo401 && response.statusCode == 401) {
       await StorageService.clearToken();
     }
     return response;
