@@ -207,107 +207,96 @@ class _TicketmanHomePageState extends State<TicketmanHomePage> {
         ],
       ),
 
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 450),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (carregandoLoja)
-                        const Padding(
-                          padding: EdgeInsets.all(24),
-                          child: CircularProgressIndicator(
-                            color: ClubbarColors.primaria,
-                          ),
-                        )
-                      else
-                        _cardLoja(),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450),
+            child: Column(
+              children: [
+                if (carregandoLoja)
+                  const Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(
+                      color: ClubbarColors.primaria,
+                    ),
+                  )
+                else
+                  _cardLoja(),
 
-                      const SizedBox(height: 28),
+                const SizedBox(height: 28),
 
-                      const Text(
-                        'Ticketman',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      const Icon(
-                        Icons.security,
-                        size: 90,
-                        color: ClubbarColors.primaria,
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      Text(
-                        'Olá, $nomeUsuario',
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-
-                      const SizedBox(height: 8),
-
-                      Text(
-                        dataHoraAtual,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.black87,
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      const Text(
-                        'Validação de ingressos e controle de acesso',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 16, color: Colors.black54),
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      SizedBox(
-                        width: double.infinity,
-                        height: 60,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    const LeitorQrRetiradaIngressoScreen(),
-                              ),
-                            );
-                          },
-                          icon: const Icon(Icons.qr_code_scanner),
-                          label: const Text(
-                            'Ler QRCode do Ingresso',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                const Text(
+                  'Ticketman',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
                 ),
-              ),
+
+                const SizedBox(height: 20),
+
+                const Icon(
+                  Icons.security,
+                  size: 90,
+                  color: ClubbarColors.primaria,
+                ),
+
+                const SizedBox(height: 24),
+
+                Text(
+                  'Olá, $nomeUsuario',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  dataHoraAtual,
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+
+                const SizedBox(height: 20),
+
+                const Text(
+                  'Validação de ingressos e controle de acesso',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+
+                const SizedBox(height: 40),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              const LeitorQrRetiradaIngressoScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: const Text(
+                      'Ler QRCode do Ingresso',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
