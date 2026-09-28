@@ -264,7 +264,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
           const SizedBox(height: 8),
 
           Text(
-            'Atendente: $nomeUsuario',
+            'Olá, $nomeUsuario',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 18,
@@ -282,58 +282,6 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
               fontSize: 14,
               color: Colors.grey.shade700,
               fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _cardInformacao() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 44,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Colors.blue.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(Icons.info_outline_rounded, color: Colors.blue),
-          ),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Leitura de produto',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-                ),
-
-                const SizedBox(height: 4),
-
-                Text(
-                  'Leia o QR Code exibido na carteira do cliente '
-                  'ou na imagem de um presente Clubbar.',
-                  style: TextStyle(
-                    color: Colors.grey.shade700,
-                    fontSize: 13,
-                    height: 1.4,
-                  ),
-                ),
-              ],
             ),
           ),
         ],
@@ -399,6 +347,8 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
       );
     }
 
+    final tituloCargo = cargoUsuario == 'WAITER' ? 'Waiter' : 'Barman';
+
     return Expanded(
       child: RefreshIndicator(
         onRefresh: carregarDados,
@@ -413,11 +363,19 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                   children: [
                     _cardLoja(),
 
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 18),
 
-                    _cardInformacao(),
+                    Text(
+                      tituloCargo,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
 
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 18),
 
                     SizedBox(
                       width: double.infinity,
@@ -445,18 +403,6 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                         ),
                       ),
                     ),
-
-                    const SizedBox(height: 12),
-
-                    Text(
-                      'O produto somente será baixado após a confirmação.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -473,8 +419,8 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
     final subtitulo = carregando
         ? 'Carregando dados do estabelecimento...'
         : nomeLoja.isEmpty
-        ? 'Atendente: $nomeUsuario'
-        : '$nomeLoja • Atendente: $nomeUsuario';
+        ? 'Olá, $nomeUsuario'
+        : '$nomeLoja • Olá, $nomeUsuario';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF6F6F6),
