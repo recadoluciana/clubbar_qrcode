@@ -185,6 +185,7 @@ class ApiService {
 
   static Future<Map<String, dynamic>> confirmarRetiradaPorToken({
     required String token,
+    int? eventoId,
   }) async {
     try {
       final usuarioId = await StorageService.getUsuarioId();
@@ -195,11 +196,14 @@ class ApiService {
         );
       }
 
+      final parametros = <String, String>{
+        'usuario_id': '$usuarioId',
+        if (eventoId != null) 'evento_id': '$eventoId',
+      };
       final uri = Uri.parse(
         '${ApiConfig.baseUrl}/entregas/entregar-por-token/'
-        '${Uri.encodeComponent(token)}'
-        '?usuario_id=$usuarioId',
-      );
+        '${Uri.encodeComponent(token)}',
+      ).replace(queryParameters: parametros);
 
       final response = await _tratarRespostaDeAutenticacao(
         await http.post(uri, headers: await _headers()),
@@ -224,6 +228,36 @@ class ApiService {
     } catch (e) {
       throw Exception(e.toString().replaceFirst('Exception: ', ''));
     }
+  }
+
+  static Future<List<Map<String, dynamic>>> listarEventosHojeTicketman() async {
+    final response = await get('/eventos/leitor-ingressos/hoje');
+    final texto = response.body.trim();
+    final corpo = texto.isEmpty ? const <dynamic>[] : jsonDecode(texto);
+    if (response.statusCode != 200) {
+      final detalhe = corpo is Map ? corpo['detail']?.toString() : null;
+      throw Exception(
+        detalhe ?? 'Não foi possível carregar os eventos de hoje.',
+      );
+    }
+    return (corpo as List)
+        .map((item) => Map<String, dynamic>.from(item as Map))
+        .toList();
+  }
+
+  static Future<Map<String, dynamic>> buscarResumoEventoTicketman(
+    int eventoId,
+  ) async {
+    final response = await get('/eventos/$eventoId/leitor-ingressos/resumo');
+    final texto = response.body.trim();
+    final corpo = texto.isEmpty ? <String, dynamic>{} : jsonDecode(texto);
+    if (response.statusCode != 200) {
+      final detalhe = corpo is Map ? corpo['detail']?.toString() : null;
+      throw Exception(
+        detalhe ?? 'Não foi possível carregar o resumo do evento.',
+      );
+    }
+    return Map<String, dynamic>.from(corpo as Map);
   }
 
   static Future<Map<String, dynamic>> buscarLojaDoUsuario({

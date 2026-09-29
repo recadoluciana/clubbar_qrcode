@@ -9,10 +9,12 @@ import '../../core/theme/clubbar_colors.dart';
 
 class LeitorQrRetiradaIngressoScreen extends StatefulWidget {
   final bool iniciarLeitura;
+  final int? eventoId;
 
   const LeitorQrRetiradaIngressoScreen({
     super.key,
     this.iniciarLeitura = false,
+    this.eventoId,
   });
 
   @override
@@ -195,6 +197,13 @@ class _LeitorQrRetiradaIngressoScreenState
         return;
       }
 
+      final eventoLido = int.tryParse('${data['evento_id'] ?? ''}');
+      if (widget.eventoId != null && eventoLido != widget.eventoId) {
+        throw Exception(
+          'Este ingresso pertence a outro evento. Volte e selecione o evento correto.',
+        );
+      }
+
       final loja = data['nmloja'];
       final cliente = data['nmcliente'];
       final participante = data['nmparticipante'];
@@ -339,6 +348,7 @@ class _LeitorQrRetiradaIngressoScreenState
                 try {
                   final resposta = await ApiService.confirmarRetiradaPorToken(
                     token: token,
+                    eventoId: widget.eventoId,
                   );
 
                   if (!mounted) return;
