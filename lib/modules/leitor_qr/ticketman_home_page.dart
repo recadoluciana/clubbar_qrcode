@@ -217,15 +217,7 @@ class _TicketmanHomePageState extends State<TicketmanHomePage> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
-
-                const Icon(
-                  Icons.security,
-                  size: 90,
-                  color: ClubbarColors.primaria,
-                ),
-
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
 
                 Text(
                   'Olá, $nomeUsuario',
