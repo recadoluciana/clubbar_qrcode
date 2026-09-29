@@ -379,7 +379,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
         return;
       }
 
-      await _abrirConfirmacaoProduto(token: token, produto: produto);
+      await _abrirConfirmacaoProduto(produto: produto);
     } catch (e) {
       await tocarErro();
       await vibrarErro();
@@ -398,7 +398,6 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
   }
 
   Future<void> _abrirConfirmacaoProduto({
-    required String token,
     required Map<String, dynamic> produto,
   }) async {
     final nomeProduto = _textoCampo(produto, [
@@ -630,21 +629,14 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
                     onPressed: confirmandoRetirada
                         ? null
                         : () async {
-                            setDialogState(() {
-                              confirmandoRetirada = true;
-                            });
-
-                            final sucesso = await _confirmarRetiradaPorToken(
-                              token: token,
+                            setDialogState(() => confirmandoRetirada = true);
+                            final sucesso = await _atualizarControleBar(
+                              produto: produto,
+                              situacao: 'ENTREGUE',
                               dialogContext: dialogContext,
                             );
-
-                            if (!dialogContext.mounted) return;
-
-                            if (!sucesso) {
-                              setDialogState(() {
-                                confirmandoRetirada = false;
-                              });
+                            if (dialogContext.mounted && !sucesso) {
+                              setDialogState(() => confirmandoRetirada = false);
                             }
                           },
                     icon: confirmandoRetirada
@@ -653,19 +645,53 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
                             height: 19,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.black,
+                              color: Colors.white,
                             ),
                           )
                         : const Icon(Icons.check_circle_outline_rounded),
                     label: Text(
-                      confirmandoRetirada
-                          ? 'Confirmando...'
-                          : 'Confirmar retirada',
+                      confirmandoRetirada ? 'Entregando...' : 'Entregar',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.green.shade700,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
+
+                if (!jaUtilizado) const SizedBox(width: 8),
+
+                if (!jaUtilizado)
+                  ElevatedButton.icon(
+                    onPressed: confirmandoRetirada
+                        ? null
+                        : () async {
+                            final dados = await _pedirDadosDeProducao();
+                            if (dados == null || !dialogContext.mounted) return;
+                            setDialogState(() => confirmandoRetirada = true);
+                            final sucesso = await _atualizarControleBar(
+                              produto: produto,
+                              situacao: 'EM_PRODUCAO',
+                              nrMesa: dados['nrMesa'],
+                              observacao: dados['observacao'],
+                              dialogContext: dialogContext,
+                            );
+                            if (dialogContext.mounted && !sucesso) {
+                              setDialogState(() => confirmandoRetirada = false);
+                            }
+                          },
+                    icon: const Icon(Icons.restaurant_rounded),
+                    label: const Text(
+                      'Produzir',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange.shade700,
+                      foregroundColor: Colors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
@@ -686,47 +712,98 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     }
   }
 
-  Future<bool> _confirmarRetiradaPorToken({
-    required String token,
+  Future<Map<String, String>?> _pedirDadosDeProducao() async {
+    final mesaController = TextEditingController();
+    final observacaoController = TextEditingController();
+    final resultado = await showDialog<Map<String, String>>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Enviar para produção'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: mesaController,
+              maxLength: 50,
+              decoration: const InputDecoration(
+                labelText: 'Número da mesa (opcional)',
+                prefixIcon: Icon(Icons.table_restaurant_rounded),
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: observacaoController,
+              maxLength: 255,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                labelText: 'Observação (opcional)',
+                alignLabelWithHint: true,
+                prefixIcon: Icon(Icons.notes_rounded),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () => Navigator.pop(dialogContext, {
+              'nrMesa': mesaController.text.trim(),
+              'observacao': observacaoController.text.trim(),
+            }),
+            icon: const Icon(Icons.restaurant_rounded),
+            label: const Text('Produzir'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange.shade700,
+              foregroundColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+    mesaController.dispose();
+    observacaoController.dispose();
+    return resultado;
+  }
+
+  Future<bool> _atualizarControleBar({
+    required Map<String, dynamic> produto,
+    required String situacao,
+    String? nrMesa,
+    String? observacao,
     required BuildContext dialogContext,
   }) async {
     try {
-      /*
-       * Troque apenas o nome deste método se a sua função
-       * no ApiService tiver outro nome.
-       */
-      final resposta = await ApiService.confirmarRetiradaPorToken(token: token);
+      final itvendaId = int.tryParse('${produto['itvenda_id'] ?? ''}');
+      if (itvendaId == null) {
+        throw Exception('Produto inválido para controle de produção.');
+      }
+      await ApiService.atualizarControleBar(
+        itvendaId: itvendaId,
+        situacao: situacao,
+        nrMesa: nrMesa,
+        observacao: observacao,
+      );
 
       if (!mounted || !dialogContext.mounted) return false;
 
       Navigator.pop(dialogContext, true);
 
-      final jaEntregue =
-          resposta['already'] == true || resposta['ja_utilizado'] == true;
+      await tocarOk();
+      await vibrarSucesso();
 
-      if (jaEntregue) {
-        await tocarErro();
-        await vibrarErro();
+      if (!mounted) return false;
 
-        if (!mounted) return false;
-
-        await _mostrarResultado(
-          sucesso: false,
-          titulo: 'Produto já utilizado',
-          mensagem: 'Este produto já havia sido entregue anteriormente.',
-        );
-      } else {
-        await tocarOk();
-        await vibrarSucesso();
-
-        if (!mounted) return false;
-
-        await _mostrarResultado(
-          sucesso: true,
-          titulo: 'Produto entregue',
-          mensagem: 'A retirada foi confirmada com sucesso.',
-        );
-      }
+      final emProducao = situacao == 'EM_PRODUCAO';
+      await _mostrarResultado(
+        sucesso: true,
+        titulo: emProducao ? 'Produto em produção' : 'Produto entregue',
+        mensagem: emProducao
+            ? 'O produto foi enviado para a produção.'
+            : 'O produto foi marcado como entregue.',
+      );
 
       await _prepararNovaLeitura();
 
@@ -750,7 +827,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
 
       await _mostrarResultado(
         sucesso: false,
-        titulo: jaUtilizado ? 'Produto já utilizado' : 'Erro na retirada',
+        titulo: jaUtilizado ? 'Produto já utilizado' : 'Não foi possível atualizar o produto',
         mensagem: mensagem,
       );
 

@@ -8,6 +8,7 @@ import '../../core/theme/clubbar_colors.dart';
 import '../../core/widgets/clubbar_app_bar.dart';
 import '../auth/login_page.dart';
 import 'leitor_qr_retirada_page.dart';
+import 'produtos_em_producao_page.dart';
 
 class BarmanHomePage extends StatefulWidget {
   const BarmanHomePage({super.key});
@@ -126,6 +127,13 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
     await Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const LeitorQrRetiradaScreen()),
+    );
+  }
+
+  Future<void> abrirProdutosEmProducao() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ProdutosEmProducaoPage()),
     );
   }
 
@@ -328,7 +336,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                 const SizedBox(height: 28),
 
                 const Text(
-                  'Barman / Waiter',
+                  'Barman/Waiter',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -365,7 +373,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                 const SizedBox(height: 20),
 
                 const Text(
-                  'Validação de tickets de produtos',
+                  'Validação de produtos',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.black54),
                 ),
@@ -384,6 +392,28 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton.icon(
+                    onPressed: abrirProdutosEmProducao,
+                    icon: const Icon(Icons.restaurant_menu_rounded),
+                    label: const Text(
+                      'Produtos em produção',
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange.shade700,
+                      foregroundColor: Colors.white,
                     ),
                   ),
                 ),
