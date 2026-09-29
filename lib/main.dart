@@ -26,7 +26,7 @@ class ClubbarQrCodeApp extends StatelessWidget {
       builder: (_, versaoSessao, _) => MaterialApp(
         key: ValueKey(versaoSessao),
         debugShowCheckedModeBanner: false,
-        title: 'Clubbar QR Code',
+        title: 'Clubbar QrCode',
         theme: AppTheme.light,
         locale: const Locale('pt', 'BR'),
         supportedLocales: const [Locale('pt', 'BR')],
@@ -66,8 +66,7 @@ class _DecisorDeSessaoState extends State<_DecisorDeSessao> {
     if (!mounted) return;
     setState(() {
       _cargo = cargo;
-      _temSessaoOperacional =
-          token != null && token.isNotEmpty && operacional;
+      _temSessaoOperacional = token != null && token.isNotEmpty && operacional;
       _carregando = false;
     });
   }

@@ -267,7 +267,7 @@ class _TicketmanHomePageState extends State<TicketmanHomePage> {
                     },
                     icon: const Icon(Icons.qr_code_scanner),
                     label: const Text(
-                      'Ler QRCode do Ingresso',
+                      'Ler QrCode do Ingresso',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
