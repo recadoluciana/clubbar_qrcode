@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../core/config/api_config.dart';
 import '../../core/services/api_service.dart';
-import '../leitor_qr/leitor_qr_retirada_ingresso.dart';
+import '../leitor_qr/ticketman_eventos_page.dart';
 import '../auth/login_page.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/theme/clubbar_colors.dart';
@@ -260,15 +260,13 @@ class _TicketmanHomePageState extends State<TicketmanHomePage> {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) => const LeitorQrRetiradaIngressoScreen(
-                            iniciarLeitura: true,
-                          ),
+                          builder: (_) => const TicketmanEventosHojePage(),
                         ),
                       );
                     },
-                    icon: const Icon(Icons.qr_code_scanner),
+                    icon: const Icon(Icons.event_available_rounded),
                     label: const Text(
-                      'Ler QrCode do Ingresso',
+                      'Selecionar evento',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
