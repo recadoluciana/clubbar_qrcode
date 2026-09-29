@@ -80,16 +80,22 @@ class _LeitorQrRetiradaIngressoScreenState
             fontWeight: FontWeight.bold,
           ),
         ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            style: TextButton.styleFrom(
+              foregroundColor: sucesso ? Colors.green : Colors.red,
+              backgroundColor: Colors.white,
+            ),
+            child: const Text(
+              'Fechar',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
       ),
     );
-  }
-
-  Future<void> _fecharResultadoDepois() async {
-    await Future.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      Navigator.of(context, rootNavigator: true).pop();
-    }
   }
 
   String _motivoDaValidacao(Object erro) {
@@ -181,13 +187,11 @@ class _LeitorQrRetiradaIngressoScreenState
           lendoQr = false;
         });
 
-        _mostrarResultado(
+        await _mostrarResultado(
           sucesso: false,
           mensagem:
               'Este QR Code é de um produto.\nAbra Meus produtos para fazer a retirada.',
         );
-
-        await _fecharResultadoDepois();
         return;
       }
 
@@ -353,12 +357,10 @@ class _LeitorQrRetiradaIngressoScreenState
                       lendoQr = false;
                     });
 
-                    _mostrarResultado(
+                    await _mostrarResultado(
                       sucesso: false,
                       mensagem: 'INGRESSO JÁ UTILIZADO',
                     );
-
-                    await _fecharResultadoDepois();
                   } else {
                     await tocarOk();
                     await vibrarSucesso();
@@ -370,12 +372,10 @@ class _LeitorQrRetiradaIngressoScreenState
                       lendoQr = false;
                     });
 
-                    _mostrarResultado(
+                    await _mostrarResultado(
                       sucesso: true,
                       mensagem: 'INGRESSO VALIDADO',
                     );
-
-                    await _fecharResultadoDepois();
                   }
                 } catch (e) {
                   if (!mounted) return;
@@ -392,12 +392,10 @@ class _LeitorQrRetiradaIngressoScreenState
                     lendoQr = false;
                   });
 
-                  _mostrarResultado(
+                  await _mostrarResultado(
                     sucesso: false,
                     mensagem: _motivoDaValidacao(e),
                   );
-
-                  await _fecharResultadoDepois();
                 }
               },
               child: const Text('Validar ingresso'),
@@ -416,9 +414,7 @@ class _LeitorQrRetiradaIngressoScreenState
 
       if (!mounted) return;
 
-      _mostrarResultado(sucesso: false, mensagem: _motivoDaValidacao(e));
-
-      await _fecharResultadoDepois();
+      await _mostrarResultado(sucesso: false, mensagem: _motivoDaValidacao(e));
     }
   }
 
