@@ -242,7 +242,6 @@ class _LeitorQrRetiradaIngressoScreenState
         context: context,
         barrierDismissible: false,
         builder: (_) => AlertDialog(
-          title: const Text('Dados do ingresso'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
