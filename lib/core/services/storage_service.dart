@@ -68,7 +68,6 @@ class StorageService {
   static Future<void> saveNomeUsuario(String nome) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_nomeUsuarioKey, nome);
-    _notificarSessaoAlterada();
   }
 
   static Future<String?> getNomeUsuario() async {
