@@ -157,7 +157,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.check_circle_outline_rounded),
-                label: Text(entregando ? 'Entregando...' : 'Entregar'),
+                label: Text(entregando ? 'Entregando...' : 'Entregue'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ClubbarColors.primaria,
                   foregroundColor: Colors.white,
@@ -255,7 +255,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                   ),
                   const SizedBox(height: 5),
                   const Text(
-                    'Marque como entregue quando o pedido estiver pronto.',
+                    'Clique em Entregue quando o produto estiver pronto e for entregue ao cliente.',
                   ),
                   const SizedBox(height: 18),
                   ..._itens.map(_card),
