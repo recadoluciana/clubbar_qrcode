@@ -106,6 +106,32 @@ class _LeitorQrRetiradaIngressoScreenState
     return 'Não foi possível validar este ingresso.';
   }
 
+  String _primeiroTexto(
+    Map<String, dynamic> dados,
+    List<String> chaves, {
+    String padrao = '',
+  }) {
+    for (final chave in chaves) {
+      final valor = (dados[chave] ?? '').toString().trim();
+      if (valor.isNotEmpty && valor.toLowerCase() != 'null') return valor;
+    }
+    return padrao;
+  }
+
+  Widget _detalheIngresso(String titulo, String valor) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Text.rich(
+        TextSpan(
+          text: '$titulo: ',
+          style: const TextStyle(fontWeight: FontWeight.w600),
+          children: [TextSpan(text: valor)],
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   Future<void> _processarQr(String raw) async {
     if (processando) return;
 
@@ -149,9 +175,40 @@ class _LeitorQrRetiradaIngressoScreenState
 
       final loja = data['nmloja'];
       final cliente = data['nmcliente'];
-      final produto = data['nmproduto'];
       final participante = data['nmparticipante'];
       final cpf = data['cpfparticipante'];
+      final nomeEvento = _primeiroTexto(data, const [
+        'nmevento',
+        'nmproduto',
+      ], padrao: 'Ingresso Clubbar');
+      final lote = _primeiroTexto(data, const ['nmlote', 'lote']);
+      final numeroLote = _primeiroTexto(data, const ['nrlote', 'numero_lote']);
+      final loteExibicao = lote.isNotEmpty
+          ? lote
+          : numeroLote.isNotEmpty
+          ? 'Lote $numeroLote'
+          : 'Lote não informado';
+      final setor = _primeiroTexto(data, const [
+        'nmsetor',
+        'nmsetoringresso',
+        'setor',
+      ], padrao: 'Setor não informado');
+      final modalidade = _primeiroTexto(data, const [
+        'nmpreco',
+        'tipopreco',
+      ], padrao: 'Modalidade não informada');
+      final dataEvento = _primeiroTexto(data, const [
+        'dtinicioevento_fmt',
+        'dtinicioevento',
+      ], padrao: 'Data não informada');
+      final localEvento = _primeiroTexto(data, const [
+        'nmlocalevento',
+        'nmloja',
+      ], padrao: loja.toString());
+      final enderecoEvento = _primeiroTexto(data, const [
+        'dsendlocevento',
+        'endereco_estabelecimento',
+      ], padrao: 'Endereço do estabelecimento');
 
       final fotoUrl = ApiConfig.buildUrl(
         (data['urlfotoproduto'] ?? '').toString(),
@@ -163,77 +220,86 @@ class _LeitorQrRetiradaIngressoScreenState
         context: context,
         barrierDismissible: false,
         builder: (_) => AlertDialog(
-          title: const Text('QR Code do ingresso'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                produto.toString(),
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              if (fotoUrl.isNotEmpty)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.network(
-                    fotoUrl,
-                    height: 140,
-                    width: 140,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) =>
-                        const Icon(Icons.image_not_supported, size: 70),
-                  ),
-                )
-              else
-                const Icon(
-                  Icons.confirmation_number_outlined,
-                  size: 80,
-                  color: ClubbarColors.primaria,
-                ),
-
-              const SizedBox(height: 14),
-
-              Text(
-                'Cliente: $cliente',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 16),
-              ),
-
-              if ((participante ?? '').toString().trim().isNotEmpty) ...[
-                const SizedBox(height: 8),
+          title: const Text('Dados do ingresso'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                 Text(
-                  'Participante: $participante',
+                  nomeEvento,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                    fontSize: 17,
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-              ],
 
-              if ((cpf ?? '').toString().trim().isNotEmpty) ...[
-                const SizedBox(height: 4),
+                const SizedBox(height: 10),
+
+                if (fotoUrl.isNotEmpty)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.network(
+                      fotoUrl,
+                      height: 110,
+                      width: 110,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) =>
+                          const Icon(Icons.image_not_supported, size: 70),
+                    ),
+                  )
+                else
+                  const Icon(
+                    Icons.confirmation_number_outlined,
+                    size: 70,
+                    color: ClubbarColors.primaria,
+                  ),
+
+                const SizedBox(height: 10),
+                _detalheIngresso('Lote', loteExibicao),
+                _detalheIngresso('Setor', setor),
+                _detalheIngresso('Modalidade', modalidade),
+                _detalheIngresso('Data e hora', dataEvento),
+                _detalheIngresso('Local', localEvento),
+                _detalheIngresso('Endereço', enderecoEvento),
+                const SizedBox(height: 12),
+
                 Text(
-                  'CPF: $cpf',
+                  'Cliente: $cliente',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 15),
+                  style: const TextStyle(fontSize: 16),
+                ),
+
+                if ((participante ?? '').toString().trim().isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'Participante: $participante',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+
+                if ((cpf ?? '').toString().trim().isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    'CPF: $cpf',
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontSize: 15),
+                  ),
+                ],
+
+                const SizedBox(height: 8),
+
+                Text(
+                  'Estabelecimento: $loja',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
                 ),
               ],
-
-              const SizedBox(height: 8),
-
-              Text(
-                'Estabelecimento: $loja',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
-              ),
-            ],
+            ),
           ),
           actions: [
             TextButton(
