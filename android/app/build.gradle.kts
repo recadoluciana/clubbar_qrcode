@@ -15,6 +15,9 @@ if (keystorePropertiesFile.exists()) {
     keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
 }
 
+fun signingValue(propertyName: String, environmentName: String): String? =
+    System.getenv(environmentName) ?: keystoreProperties.getProperty(propertyName)
+
 android {
     namespace = "com.clubbar.clubbar_qrcode"
     compileSdk = flutter.compileSdkVersion
@@ -42,10 +45,10 @@ android {
 
     signingConfigs {
         create("release") {
-            keyAlias = keystoreProperties["keyAlias"] as String?
-            keyPassword = keystoreProperties["keyPassword"] as String?
-            storeFile = keystoreProperties["storeFile"]?.let { file(it) }
-            storePassword = keystoreProperties["storePassword"] as String?
+            keyAlias = signingValue("keyAlias", "CM_KEY_ALIAS")
+            keyPassword = signingValue("keyPassword", "CM_KEY_PASSWORD")
+            storeFile = signingValue("storeFile", "CM_KEYSTORE_PATH")?.let { file(it) }
+            storePassword = signingValue("storePassword", "CM_KEYSTORE_PASSWORD")
         }
     }
 
