@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.clubbar" "\0"
-            VALUE "FileDescription", "clubbar_qrcode" "\0"
+            VALUE "FileDescription", "Clubbar QrCode Reader" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "clubbar_qrcode" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 com.clubbar. All rights reserved." "\0"
             VALUE "OriginalFilename", "clubbar_qrcode.exe" "\0"
-            VALUE "ProductName", "clubbar_qrcode" "\0"
+            VALUE "ProductName", "Clubbar QrCode Reader" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
