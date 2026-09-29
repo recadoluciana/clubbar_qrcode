@@ -351,7 +351,7 @@ class _TicketmanResumoEventoPageState extends State<TicketmanResumoEventoPage> {
                         ClubbarColors.primaria,
                       ),
                       _total(
-                        'Faltam',
+                        'Pendentes',
                         evento?['faltam'] ?? 0,
                         Icons.person_outline_rounded,
                         Colors.orange.shade800,
