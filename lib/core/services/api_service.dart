@@ -230,6 +230,75 @@ class ApiService {
     }
   }
 
+  static Future<Map<String, dynamic>> atualizarControleBar({
+    required int itvendaId,
+    required String situacao,
+    String? nrMesa,
+    String? observacao,
+  }) async {
+    final usuarioId = await StorageService.getUsuarioId();
+    if (usuarioId == null || usuarioId == 0) {
+      throw Exception('Usuário responsável não identificado. Faça login novamente.');
+    }
+
+    final response = await _tratarRespostaDeAutenticacao(
+      await http.post(
+        Uri.parse(
+          '${ApiConfig.baseUrl}/entregas/controle-bar/$itvendaId?usuario_id=$usuarioId',
+        ),
+        headers: await _headers(),
+        body: jsonEncode({
+          'situacao': situacao,
+          if (nrMesa != null) 'nrmesa': nrMesa,
+          if (observacao != null) 'observacao': observacao,
+        }),
+      ),
+    );
+
+    final body = response.body.trim().isEmpty
+        ? <String, dynamic>{}
+        : Map<String, dynamic>.from(jsonDecode(response.body));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+        body['detail']?.toString() ??
+            'Não foi possível atualizar o produto.',
+      );
+    }
+    return body;
+  }
+
+  static Future<List<Map<String, dynamic>>> listarProdutosEmProducao() async {
+    final usuarioId = await StorageService.getUsuarioId();
+    if (usuarioId == null || usuarioId == 0) {
+      throw Exception('Usuário responsável não identificado. Faça login novamente.');
+    }
+
+    final response = await _tratarRespostaDeAutenticacao(
+      await http.get(
+        Uri.parse(
+          '${ApiConfig.baseUrl}/entregas/controle-bar/em-producao?usuario_id=$usuarioId',
+        ),
+        headers: await _headers(),
+      ),
+    );
+    final body = response.body.trim().isEmpty
+        ? <String, dynamic>{}
+        : Map<String, dynamic>.from(jsonDecode(response.body));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+        body['detail']?.toString() ??
+            'Não foi possível carregar os produtos em produção.',
+      );
+    }
+
+    final itens = body['itens'];
+    if (itens is! List) return [];
+    return itens
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+  }
+
   static Future<List<Map<String, dynamic>>> listarEventosHojeTicketman() async {
     final response = await get('/eventos/leitor-ingressos/hoje');
     final texto = response.body.trim();
