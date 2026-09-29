@@ -45,15 +45,27 @@ class ClubbarAppBar extends StatelessWidget implements PreferredSizeWidget {
       flexibleSpace: SafeArea(
         bottom: false,
         child: IgnorePointer(
-          child: const Center(
-            child: Text(
-              'CLUBBAR QR CODE',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.1,
-              ),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Image.asset(
+                  'assets/images/coruja.png',
+                  width: 29,
+                  height: 33,
+                  fit: BoxFit.contain,
+                ),
+                const SizedBox(width: 8),
+                const Text(
+                  'Clubbar QrCode Reader',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ],
             ),
           ),
         ),

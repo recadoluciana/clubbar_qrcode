@@ -6,7 +6,6 @@ import '../../core/services/api_service.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/theme/clubbar_colors.dart';
 import '../../core/widgets/clubbar_app_bar.dart';
-import '../../core/widgets/clubbar_page_header.dart';
 import '../auth/login_page.dart';
 import 'leitor_qr_retirada_page.dart';
 
@@ -209,7 +208,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
   Widget _cardLoja() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(22, 24, 22, 24),
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
@@ -220,7 +219,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
             ClubbarColors.fundo,
           ],
         ),
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -232,56 +231,27 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
       child: Column(
         children: [
           Container(
-            width: 100,
-            height: 100,
+            width: 94,
+            height: 94,
             decoration: BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
               border: Border.all(color: ClubbarColors.primariaClaro, width: 3),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 8,
-                  offset: Offset(0, 3),
-                ),
-              ],
             ),
             child: ClipOval(child: _logoDaLoja()),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
 
           Text(
             nomeLoja,
             textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              fontSize: 22,
+              fontSize: 21,
               fontWeight: FontWeight.w900,
               color: Colors.black,
-            ),
-          ),
-
-          const SizedBox(height: 8),
-
-          Text(
-            'Olá, $nomeUsuario',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey.shade800,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-
-          const SizedBox(height: 5),
-
-          Text(
-            dataHoraAtual,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -291,131 +261,135 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
 
   Widget _conteudo() {
     if (carregando) {
-      return const Expanded(
-        child: Center(
-          child: CircularProgressIndicator(color: ClubbarColors.primaria),
-        ),
+      return const Center(
+        child: CircularProgressIndicator(color: ClubbarColors.primaria),
       );
     }
 
     if (erro != null) {
-      return Expanded(
-        child: RefreshIndicator(
-          onRefresh: carregarDados,
-          child: ListView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(24),
-            children: [
-              const SizedBox(height: 70),
+      return RefreshIndicator(
+        onRefresh: carregarDados,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(24),
+          children: [
+            const SizedBox(height: 70),
 
-              Icon(
-                Icons.cloud_off_rounded,
-                size: 68,
-                color: Colors.grey.shade400,
+            Icon(
+              Icons.cloud_off_rounded,
+              size: 68,
+              color: Colors.grey.shade400,
+            ),
+
+            const SizedBox(height: 16),
+
+            const Text(
+              'Não foi possível carregar o estabelecimento',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900),
+            ),
+
+            const SizedBox(height: 8),
+
+            Text(
+              erro!,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey.shade700, height: 1.4),
+            ),
+
+            const SizedBox(height: 20),
+
+            ElevatedButton.icon(
+              onPressed: carregarDados,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Tentar novamente'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: ClubbarColors.primaria,
+                foregroundColor: Colors.white,
               ),
-
-              const SizedBox(height: 16),
-
-              const Text(
-                'Não foi possível carregar o estabelecimento',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                erro!,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey.shade700, height: 1.4),
-              ),
-
-              const SizedBox(height: 20),
-
-              ElevatedButton.icon(
-                onPressed: carregarDados,
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Tentar novamente'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ClubbarColors.primaria,
-                  foregroundColor: Colors.white,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       );
     }
 
-    return Expanded(
-      child: RefreshIndicator(
-        onRefresh: carregarDados,
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(24, 22, 24, 28),
-          children: [
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 430),
-                child: Column(
-                  children: [
-                    _cardLoja(),
+    return RefreshIndicator(
+      onRefresh: carregarDados,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 450),
+            child: Column(
+              children: [
+                _cardLoja(),
 
-                    const SizedBox(height: 18),
+                const SizedBox(height: 28),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.room_service_rounded,
-                          size: 22,
-                          color: Colors.grey.shade700,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Barman / Waiter',
-                          style: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ],
-                    ),
+                const Text(
+                  'Barman / Waiter',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
 
-                    const SizedBox(height: 18),
+                const SizedBox(height: 20),
 
-                    SizedBox(
-                      width: double.infinity,
-                      height: 58,
-                      child: ElevatedButton.icon(
-                        onPressed: abrirLeitorQr,
-                        icon: const Icon(
-                          Icons.qr_code_scanner_rounded,
-                          size: 25,
-                        ),
-                        label: const Text(
-                          'Ler QR Code do produto',
-                          style: TextStyle(
-                            fontSize: 17,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ClubbarColors.primaria,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
+                const Icon(
+                  Icons.room_service_rounded,
+                  size: 90,
+                  color: ClubbarColors.primaria,
+                ),
+
+                const SizedBox(height: 24),
+
+                Text(
+                  'Olá, $nomeUsuario',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  dataHoraAtual,
+                  style: const TextStyle(fontSize: 16, color: Colors.black87),
+                ),
+
+                const SizedBox(height: 20),
+
+                const Text(
+                  'Validação de tickets de produtos',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16, color: Colors.black54),
+                ),
+
+                const SizedBox(height: 40),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 60,
+                  child: ElevatedButton.icon(
+                    onPressed: abrirLeitorQr,
+                    icon: const Icon(Icons.qr_code_scanner),
+                    label: const Text(
+                      'Ler QrCode do Produto',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -423,27 +397,12 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final tituloCargo = cargoUsuario == 'WAITER' ? 'Waiter' : 'Barman';
-    final subtitulo = carregando
-        ? 'Carregando dados do estabelecimento...'
-        : nomeLoja.isEmpty
-        ? 'Olá, $nomeUsuario'
-        : '$nomeLoja • Olá, $nomeUsuario';
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F6F6),
+      backgroundColor: Colors.white,
 
       appBar: ClubbarAppBar(mostrarSair: true, onSair: sair),
 
-      body: SafeArea(
-        child: Column(
-          children: [
-            ClubbarPageHeader(titulo: tituloCargo, subtitulo: subtitulo),
-
-            _conteudo(),
-          ],
-        ),
-      ),
+      body: _conteudo(),
     );
   }
 }
