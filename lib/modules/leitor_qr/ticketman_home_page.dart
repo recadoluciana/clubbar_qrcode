@@ -260,8 +260,9 @@ class _TicketmanHomePageState extends State<TicketmanHomePage> {
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
-                          builder: (_) =>
-                              const LeitorQrRetiradaIngressoScreen(),
+                          builder: (_) => const LeitorQrRetiradaIngressoScreen(
+                            iniciarLeitura: true,
+                          ),
                         ),
                       );
                     },
