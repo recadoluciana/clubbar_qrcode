@@ -81,6 +81,31 @@ class _LeitorQrRetiradaIngressoScreenState
     }
   }
 
+  String _motivoDaValidacao(Object erro) {
+    final mensagem = erro.toString().replaceFirst('Exception: ', '').trim();
+    final texto = mensagem.toLowerCase();
+
+    if (texto.contains('já foi utilizado') ||
+        texto.contains('ja foi utilizado')) {
+      return 'Ingresso já utilizado.\nEste ingresso já foi validado anteriormente.';
+    }
+    if (texto.contains('outro bar') ||
+        texto.contains('outra casa noturna') ||
+        texto.contains('outro estabelecimento')) {
+      return 'Ingresso de outra casa noturna.\n$mensagem';
+    }
+    if (texto.contains('data do evento') ||
+        texto.contains('válido para o evento') ||
+        texto.contains('valido para o evento')) {
+      return 'Ingresso de outra data.\n$mensagem';
+    }
+    if (texto.contains('cancelado')) {
+      return 'Ingresso cancelado.\nEste ingresso não pode ser validado.';
+    }
+    if (mensagem.isNotEmpty) return mensagem;
+    return 'Não foi possível validar este ingresso.';
+  }
+
   Future<void> _processarQr(String raw) async {
     if (processando) return;
 
@@ -285,7 +310,7 @@ class _LeitorQrRetiradaIngressoScreenState
 
                   _mostrarResultado(
                     sucesso: false,
-                    mensagem: 'ERRO AO VALIDAR INGRESSO',
+                    mensagem: _motivoDaValidacao(e),
                   );
 
                   await _fecharResultadoDepois();
@@ -307,7 +332,7 @@ class _LeitorQrRetiradaIngressoScreenState
 
       if (!mounted) return;
 
-      _mostrarResultado(sucesso: false, mensagem: 'QR CODE INVÁLIDO');
+      _mostrarResultado(sucesso: false, mensagem: _motivoDaValidacao(e));
 
       await _fecharResultadoDepois();
     }
