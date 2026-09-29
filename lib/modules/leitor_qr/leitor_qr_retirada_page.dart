@@ -196,6 +196,10 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
         .toString()
         .trim()
         .toUpperCase();
+    final controleBar = (produto['idcontrolebar'] ?? '')
+        .toString()
+        .trim()
+        .toUpperCase();
 
     final status = (produto['status'] ?? produto['situacao'] ?? '')
         .toString()
@@ -205,6 +209,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     final disponivel = produto['disponivel'];
 
     return entregue == 'SIM' ||
+        controleBar == 'ENTREGUE' ||
         status == 'UTILIZADO' ||
         status == 'ENTREGUE' ||
         disponivel == false;
@@ -816,7 +821,9 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
           mensagem.toLowerCase().contains('já foi utilizado') ||
           mensagem.toLowerCase().contains('ja foi utilizado') ||
           mensagem.toLowerCase().contains('já utilizado') ||
-          mensagem.toLowerCase().contains('ja utilizado');
+          mensagem.toLowerCase().contains('ja utilizado') ||
+          mensagem.toLowerCase().contains('já foi entregue') ||
+          mensagem.toLowerCase().contains('ja foi entregue');
 
       await tocarErro();
       await vibrarErro();
@@ -827,7 +834,9 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
 
       await _mostrarResultado(
         sucesso: false,
-        titulo: jaUtilizado ? 'Produto já utilizado' : 'Não foi possível atualizar o produto',
+        titulo: jaUtilizado
+            ? 'Produto já utilizado'
+            : 'Não foi possível atualizar o produto',
         mensagem: mensagem,
       );
 
