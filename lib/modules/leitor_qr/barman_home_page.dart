@@ -23,6 +23,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
   String nomeLoja = '';
   String logoLoja = '';
   String dataHoraAtual = '';
+  Map<String, dynamic> resumo = const {};
 
   bool carregando = true;
   String? erro;
@@ -93,6 +94,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
       final dadosLoja = await ApiService.buscarLojaDoUsuario(
         usuarioId: usuarioId,
       );
+      final dadosResumo = await ApiService.resumoControleBar();
 
       final nomeLojaRecebido = (dadosLoja['nmloja'] ?? '').toString().trim();
 
@@ -109,6 +111,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
             : 'Estabelecimento não identificada';
 
         logoLoja = _montarUrlImagem(caminhoLogo);
+        resumo = dadosResumo;
 
         carregando = false;
       });
@@ -267,6 +270,83 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
     );
   }
 
+  int _numeroResumo(String campo) {
+    return int.tryParse('${resumo[campo] ?? 0}') ?? 0;
+  }
+
+  Widget _cardResumo({
+    required String titulo,
+    required int quantidade,
+    required IconData icone,
+    required Color cor,
+  }) {
+    return Expanded(
+      child: Container(
+        height: 82,
+        margin: const EdgeInsets.symmetric(horizontal: 3),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+        decoration: BoxDecoration(
+          color: cor.withValues(alpha: 0.11),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: cor.withValues(alpha: 0.30)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icone, color: cor, size: 18),
+            const SizedBox(height: 2),
+            Text(
+              '$quantidade',
+              style: TextStyle(
+                color: cor,
+                fontSize: 19,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            Text(
+              titulo,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _resumoProdutos() {
+    return Row(
+      children: [
+        _cardResumo(
+          titulo: 'Vendidos',
+          quantidade: _numeroResumo('vendidos'),
+          icone: Icons.shopping_bag_outlined,
+          cor: Colors.blue.shade700,
+        ),
+        _cardResumo(
+          titulo: 'Validados',
+          quantidade: _numeroResumo('validados'),
+          icone: Icons.verified_outlined,
+          cor: ClubbarColors.primaria,
+        ),
+        _cardResumo(
+          titulo: 'Em preparação',
+          quantidade: _numeroResumo('em_preparacao'),
+          icone: Icons.restaurant_rounded,
+          cor: Colors.orange.shade800,
+        ),
+        _cardResumo(
+          titulo: 'Entregues',
+          quantidade: _numeroResumo('entregues'),
+          icone: Icons.check_circle_outline_rounded,
+          cor: Colors.teal.shade700,
+        ),
+      ],
+    );
+  }
+
   Widget _conteudo() {
     if (carregando) {
       return const Center(
@@ -333,7 +413,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
               children: [
                 _cardLoja(),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 16),
 
                 const Text(
                   'Barman/Waiter',
@@ -344,7 +424,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                   ),
                 ),
 
-                const SizedBox(height: 28),
+                const SizedBox(height: 16),
 
                 Text(
                   'Olá, $nomeUsuario',
@@ -355,14 +435,14 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
 
                 Text(
                   dataHoraAtual,
                   style: const TextStyle(fontSize: 16, color: Colors.black87),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
 
                 const Text(
                   'Validação de produtos',
@@ -370,11 +450,15 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                   style: TextStyle(fontSize: 16, color: Colors.black54),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 14),
+
+                _resumoProdutos(),
+
+                const SizedBox(height: 16),
 
                 SizedBox(
                   width: double.infinity,
-                  height: 60,
+                  height: 54,
                   child: ElevatedButton.icon(
                     onPressed: abrirLeitorQr,
                     icon: const Icon(Icons.qr_code_scanner),
@@ -397,7 +481,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                     onPressed: abrirProdutosEmProducao,
                     icon: const Icon(Icons.restaurant_menu_rounded),
                     label: const Text(
-                      'Produtos em produção',
+                      'Produtos em preparação',
                       style: TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,

@@ -243,17 +243,17 @@ class ApiService {
       );
     }
 
+    final dados = <String, dynamic>{'situacao': situacao};
+    if (nrMesa != null) dados['nrmesa'] = nrMesa;
+    if (observacao != null) dados['observacao'] = observacao;
+
     final response = await _tratarRespostaDeAutenticacao(
       await http.post(
         Uri.parse(
           '${ApiConfig.baseUrl}/entregas/controle-bar/$itvendaId?usuario_id=$usuarioId',
         ),
         headers: await _headers(),
-        body: jsonEncode({
-          'situacao': situacao,
-          if (nrMesa != null) 'nrmesa': nrMesa,
-          if (observacao != null) 'observacao': observacao,
-        }),
+        body: jsonEncode(dados),
       ),
     );
 
@@ -290,7 +290,7 @@ class ApiService {
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception(
         body['detail']?.toString() ??
-            'Não foi possível carregar os produtos em produção.',
+            'Não foi possível carregar os produtos em preparação.',
       );
     }
 
@@ -300,6 +300,32 @@ class ApiService {
         .whereType<Map>()
         .map((item) => Map<String, dynamic>.from(item))
         .toList();
+  }
+
+  static Future<Map<String, dynamic>> resumoControleBar() async {
+    final usuarioId = await StorageService.getUsuarioId();
+    if (usuarioId == null || usuarioId == 0) {
+      throw Exception(
+        'Usuário responsável não identificado. Faça login novamente.',
+      );
+    }
+    final response = await _tratarRespostaDeAutenticacao(
+      await http.get(
+        Uri.parse(
+          '${ApiConfig.baseUrl}/entregas/controle-bar/resumo?usuario_id=$usuarioId',
+        ),
+        headers: await _headers(),
+      ),
+    );
+    final body = response.body.trim().isEmpty
+        ? <String, dynamic>{}
+        : Map<String, dynamic>.from(jsonDecode(response.body));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+        body['detail']?.toString() ?? 'Não foi possível carregar o resumo.',
+      );
+    }
+    return body;
   }
 
   static Future<List<Map<String, dynamic>>> listarEventosHojeTicketman() async {
