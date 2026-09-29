@@ -8,7 +8,12 @@ import '../../core/config/api_config.dart';
 import '../../core/theme/clubbar_colors.dart';
 
 class LeitorQrRetiradaIngressoScreen extends StatefulWidget {
-  const LeitorQrRetiradaIngressoScreen({super.key});
+  final bool iniciarLeitura;
+
+  const LeitorQrRetiradaIngressoScreen({
+    super.key,
+    this.iniciarLeitura = false,
+  });
 
   @override
   State<LeitorQrRetiradaIngressoScreen> createState() =>
@@ -18,9 +23,15 @@ class LeitorQrRetiradaIngressoScreen extends StatefulWidget {
 class _LeitorQrRetiradaIngressoScreenState
     extends State<LeitorQrRetiradaIngressoScreen> {
   bool processando = false;
-  bool lendoQr = false;
+  late bool lendoQr;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
+
+  @override
+  void initState() {
+    super.initState();
+    lendoQr = widget.iniciarLeitura;
+  }
 
   Future<void> vibrarSucesso() async {
     if (await Vibration.hasVibrator()) {
