@@ -238,7 +238,9 @@ class ApiService {
   }) async {
     final usuarioId = await StorageService.getUsuarioId();
     if (usuarioId == null || usuarioId == 0) {
-      throw Exception('Usuário responsável não identificado. Faça login novamente.');
+      throw Exception(
+        'Usuário responsável não identificado. Faça login novamente.',
+      );
     }
 
     final response = await _tratarRespostaDeAutenticacao(
@@ -260,8 +262,7 @@ class ApiService {
         : Map<String, dynamic>.from(jsonDecode(response.body));
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception(
-        body['detail']?.toString() ??
-            'Não foi possível atualizar o produto.',
+        body['detail']?.toString() ?? 'Não foi possível atualizar o produto.',
       );
     }
     return body;
@@ -270,7 +271,9 @@ class ApiService {
   static Future<List<Map<String, dynamic>>> listarProdutosEmProducao() async {
     final usuarioId = await StorageService.getUsuarioId();
     if (usuarioId == null || usuarioId == 0) {
-      throw Exception('Usuário responsável não identificado. Faça login novamente.');
+      throw Exception(
+        'Usuário responsável não identificado. Faça login novamente.',
+      );
     }
 
     final response = await _tratarRespostaDeAutenticacao(
