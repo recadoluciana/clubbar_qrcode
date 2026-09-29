@@ -347,8 +347,6 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
       );
     }
 
-    final tituloCargo = cargoUsuario == 'WAITER' ? 'Waiter' : 'Barman';
-
     return Expanded(
       child: RefreshIndicator(
         onRefresh: carregarDados,
@@ -365,14 +363,24 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
 
                     const SizedBox(height: 18),
 
-                    Text(
-                      tituloCargo,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.room_service_rounded,
+                          size: 22,
+                          color: Colors.grey.shade700,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Barman / Waiter',
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 18),
