@@ -29,10 +29,19 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
   );
 
   bool processando = false;
-  bool lendoQr = false;
+  bool lendoQr = true;
   bool confirmandoRetirada = false;
 
   static const String _prefixoProduto = 'CLUBBAR-PRODUTO:';
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _iniciarLeitura();
+    });
+  }
 
   @override
   void dispose() {
@@ -216,22 +225,6 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     } catch (_) {
       // A câmera pode já estar iniciada.
     }
-  }
-
-  Future<void> _pararLeitura() async {
-    try {
-      await _scannerController.stop();
-    } catch (_) {
-      // Evita falha caso a câmera já esteja parada.
-    }
-
-    if (!mounted) return;
-
-    setState(() {
-      lendoQr = false;
-      processando = false;
-      confirmandoRetirada = false;
-    });
   }
 
   Future<void> _prepararNovaLeitura() async {
@@ -880,100 +873,10 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     );
   }
 
-  Widget _telaInicialLeitor() {
-    return Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 420),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(26),
-              boxShadow: const [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 10,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Container(
-                  width: 92,
-                  height: 92,
-                  decoration: BoxDecoration(
-                    color: ClubbarColors.primaria.withValues(alpha: 0.16),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.qr_code_scanner_rounded,
-                    size: 50,
-                    color: Colors.black87,
-                  ),
-                ),
-
-                const SizedBox(height: 18),
-
-                const Text(
-                  'Leitor de retirada',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900),
-                ),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  'Leia o QR Code do produto exibido no aplicativo '
-                  'do cliente ou em uma imagem de presente.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.grey.shade700,
-                    fontSize: 14,
-                    height: 1.4,
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: _iniciarLeitura,
-                    icon: const Icon(Icons.qr_code_scanner_rounded, size: 24),
-                    label: const Text(
-                      'Ler QR Code',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ClubbarColors.primaria,
-                      foregroundColor: Colors.black,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: lendoQr ? Colors.black : const Color(0xFFF6F6F6),
+      backgroundColor: Colors.black,
 
       appBar: AppBar(
         title: const Text(
@@ -984,16 +887,15 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
         foregroundColor: Colors.white,
         centerTitle: true,
         actions: [
-          if (lendoQr)
-            IconButton(
-              tooltip: 'Fechar câmera',
-              icon: const Icon(Icons.close_rounded),
-              onPressed: processando ? null : _pararLeitura,
-            ),
+          IconButton(
+            tooltip: 'Fechar câmera',
+            icon: const Icon(Icons.close_rounded),
+            onPressed: processando ? null : () => Navigator.maybePop(context),
+          ),
         ],
       ),
 
-      body: lendoQr ? _areaLeitura() : _telaInicialLeitor(),
+      body: _areaLeitura(),
     );
   }
 }
