@@ -133,7 +133,11 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
               ],
             ),
             const SizedBox(height: 14),
-            _linha(Icons.person_outline_rounded, 'Cliente', '${item['nmcliente'] ?? 'Não informado'}'),
+            _linha(
+              Icons.person_outline_rounded,
+              'Cliente',
+              '${item['nmcliente'] ?? 'Não informado'}',
+            ),
             const SizedBox(height: 9),
             _linha(
               Icons.notes_rounded,
@@ -177,7 +181,10 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
             text: TextSpan(
               style: const TextStyle(color: Colors.black87, fontSize: 14),
               children: [
-                TextSpan(text: '$titulo: ', style: const TextStyle(fontWeight: FontWeight.w800)),
+                TextSpan(
+                  text: '$titulo: ',
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
                 TextSpan(text: valor),
               ],
             ),
@@ -200,7 +207,11 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                 padding: const EdgeInsets.all(24),
                 children: [
                   const SizedBox(height: 80),
-                  const Icon(Icons.cloud_off_rounded, size: 62, color: Colors.grey),
+                  const Icon(
+                    Icons.cloud_off_rounded,
+                    size: 62,
+                    color: Colors.grey,
+                  ),
                   const SizedBox(height: 14),
                   const Text(
                     'Não foi possível carregar os produtos em produção.',
@@ -222,7 +233,11 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                 padding: const EdgeInsets.all(24),
                 children: const [
                   SizedBox(height: 110),
-                  Icon(Icons.restaurant_menu_rounded, size: 70, color: Colors.black38),
+                  Icon(
+                    Icons.restaurant_menu_rounded,
+                    size: 70,
+                    color: Colors.black38,
+                  ),
                   SizedBox(height: 16),
                   Text(
                     'Nenhum produto em produção.',
@@ -239,7 +254,9 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 5),
-                  const Text('Marque como entregue quando o pedido estiver pronto.'),
+                  const Text(
+                    'Marque como entregue quando o pedido estiver pronto.',
+                  ),
                   const SizedBox(height: 18),
                   ..._itens.map(_card),
                 ],
