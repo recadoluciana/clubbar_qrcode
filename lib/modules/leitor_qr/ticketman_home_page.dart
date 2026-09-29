@@ -8,6 +8,7 @@ import '../leitor_qr/leitor_qr_retirada_ingresso.dart';
 import '../auth/login_page.dart';
 import '../../core/services/storage_service.dart';
 import '../../core/theme/clubbar_colors.dart';
+import '../../core/widgets/clubbar_app_bar.dart';
 
 class TicketmanHomePage extends StatefulWidget {
   const TicketmanHomePage({super.key});
@@ -170,42 +171,23 @@ class _TicketmanHomePageState extends State<TicketmanHomePage> {
     super.dispose();
   }
 
+  Future<void> _sair() async {
+    await StorageService.clearToken();
+
+    if (!mounted) return;
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginPage()),
+      (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
 
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        centerTitle: true,
-
-        title: const Text(
-          'CLUBBAR QR CODE',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.1,
-          ),
-        ),
-
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sair',
-            onPressed: () async {
-              await StorageService.clearToken();
-
-              if (!context.mounted) return;
-
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (route) => false,
-              );
-            },
-          ),
-        ],
-      ),
+      appBar: ClubbarAppBar(mostrarSair: true, onSair: _sair),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 12, 24, 28),
