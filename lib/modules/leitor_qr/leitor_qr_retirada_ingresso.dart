@@ -92,7 +92,7 @@ class _LeitorQrRetiradaIngressoScreenState
     if (texto.contains('outro bar') ||
         texto.contains('outra casa noturna') ||
         texto.contains('outro estabelecimento')) {
-      return 'Ingresso de outra casa noturna.\n$mensagem';
+      return 'QR Code de outra casa noturna.\n$mensagem';
     }
     if (texto.contains('data do evento') ||
         texto.contains('válido para o evento') ||
@@ -140,10 +140,16 @@ class _LeitorQrRetiradaIngressoScreenState
     await tocarBeep();
 
     try {
-      const prefixo = 'CLUBBAR-INGRESSO:';
+      const prefixoIngresso = 'CLUBBAR-INGRESSO:';
+      const prefixoProduto = 'CLUBBAR-PRODUTO:';
       final conteudo = raw.trim();
-      if (!conteudo.startsWith(prefixo)) {
-        throw Exception('QR Code de ingresso inválido.');
+      final prefixo = conteudo.startsWith(prefixoIngresso)
+          ? prefixoIngresso
+          : conteudo.startsWith(prefixoProduto)
+          ? prefixoProduto
+          : '';
+      if (prefixo.isEmpty) {
+        throw Exception('Este QR Code não pertence ao Clubbar.');
       }
       final token = conteudo.substring(prefixo.length).trim();
       if (token.isEmpty) {
@@ -166,7 +172,8 @@ class _LeitorQrRetiradaIngressoScreenState
 
         _mostrarResultado(
           sucesso: false,
-          mensagem: 'QR CODE DE RETIRADA DE PRODUTO',
+          mensagem:
+              'Este QR Code é de um produto.\nAbra Meus produtos para fazer a retirada.',
         );
 
         await _fecharResultadoDepois();

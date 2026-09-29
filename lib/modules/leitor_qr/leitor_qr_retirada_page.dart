@@ -33,6 +33,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
   bool confirmandoRetirada = false;
 
   static const String _prefixoProduto = 'CLUBBAR-PRODUTO:';
+  static const String _prefixoIngresso = 'CLUBBAR-INGRESSO:';
 
   @override
   void initState() {
@@ -153,11 +154,17 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
   String _extrairToken(String valorLido) {
     final texto = valorLido.trim();
 
-    if (!texto.startsWith(_prefixoProduto)) {
-      throw Exception('Este QR Code não pertence a um produto Clubbar.');
+    final prefixo = texto.startsWith(_prefixoProduto)
+        ? _prefixoProduto
+        : texto.startsWith(_prefixoIngresso)
+        ? _prefixoIngresso
+        : '';
+
+    if (prefixo.isEmpty) {
+      throw Exception('Este QR Code não pertence ao Clubbar.');
     }
 
-    final token = texto.substring(_prefixoProduto.length).trim();
+    final token = texto.substring(prefixo.length).trim();
 
     if (token.isEmpty) {
       throw Exception('Token do produto não encontrado.');
@@ -174,6 +181,14 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     }
 
     return texto;
+  }
+
+  String _tituloDiagnostico(String mensagem) {
+    final texto = mensagem.toLowerCase();
+    if (texto.contains('outro bar') || texto.contains('outra casa noturna')) {
+      return 'QR Code de outra casa noturna';
+    }
+    return 'Não foi possível ler o QR Code';
   }
 
   bool _produtoJaUtilizado(Map<String, dynamic> produto) {
@@ -345,6 +360,25 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
 
       if (!mounted) return;
 
+      final tipo = (produto['idtipoproduto'] ?? '')
+          .toString()
+          .trim()
+          .toUpperCase();
+      if (tipo != 'P') {
+        await tocarErro();
+        await vibrarErro();
+
+        if (!mounted) return;
+
+        await _mostrarResultado(
+          sucesso: false,
+          titulo: 'Este QR Code é de um ingresso',
+          mensagem: 'Abra Meus ingressos para validar este QR Code.',
+        );
+        await _prepararNovaLeitura();
+        return;
+      }
+
       await _abrirConfirmacaoProduto(token: token, produto: produto);
     } catch (e) {
       await tocarErro();
@@ -355,7 +389,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
       final mensagem = _mensagemErro(e);
 
       await _mostrarDiagnostico(
-        titulo: 'Produto de outro bar/casa noturna',
+        titulo: _tituloDiagnostico(mensagem),
         conteudo: mensagem,
       );
 
