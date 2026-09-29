@@ -63,13 +63,13 @@ class ApiConfig {
   static String get nomeApp {
     switch (appFlavor) {
       case 'dev':
-        return 'Clubbar Partner Dev';
+        return 'Clubbar QrCode Reader';
 
       case 'prod':
-        return 'Clubbar Partner';
+        return 'Clubbar QrCode Reader';
 
       default:
-        return 'Clubbar Partner';
+        return 'Clubbar QrCode Reader';
     }
   }
 
