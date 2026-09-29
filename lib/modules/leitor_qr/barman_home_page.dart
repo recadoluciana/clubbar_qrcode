@@ -344,15 +344,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                   ),
                 ),
 
-                const SizedBox(height: 20),
-
-                const Icon(
-                  Icons.room_service_rounded,
-                  size: 90,
-                  color: ClubbarColors.primaria,
-                ),
-
-                const SizedBox(height: 24),
+                const SizedBox(height: 28),
 
                 Text(
                   'Olá, $nomeUsuario',
