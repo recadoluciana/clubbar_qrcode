@@ -26,7 +26,7 @@ class ClubbarQrCodeApp extends StatelessWidget {
       builder: (_, versaoSessao, _) => MaterialApp(
         key: ValueKey(versaoSessao),
         debugShowCheckedModeBanner: false,
-        title: 'Clubbar QrCode',
+        title: 'Clubbar QrCode Reader',
         theme: AppTheme.light,
         locale: const Locale('pt', 'BR'),
         supportedLocales: const [Locale('pt', 'BR')],
