@@ -214,7 +214,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                   ),
                   const SizedBox(height: 14),
                   const Text(
-                    'Não foi possível carregar os produtos em produção.',
+                    'Não foi possível carregar os produtos em preparação.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                   ),
@@ -240,7 +240,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                   ),
                   SizedBox(height: 16),
                   Text(
-                    'Nenhum produto em produção.',
+                    'Nenhum produto em preparação.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                   ),
@@ -250,7 +250,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
                 children: [
                   const Text(
-                    'Produtos em produção',
+                    'Produtos em preparação',
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
                   ),
                   const SizedBox(height: 5),

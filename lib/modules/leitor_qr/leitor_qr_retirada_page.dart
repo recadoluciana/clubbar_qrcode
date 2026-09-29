@@ -723,7 +723,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     final resultado = await showDialog<Map<String, String>>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Enviar para produção'),
+        title: const Text('Enviar para preparação'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -783,7 +783,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     try {
       final itvendaId = int.tryParse('${produto['itvenda_id'] ?? ''}');
       if (itvendaId == null) {
-        throw Exception('Produto inválido para controle de produção.');
+        throw Exception('Produto inválido para controle de preparação.');
       }
       await ApiService.atualizarControleBar(
         itvendaId: itvendaId,
@@ -804,9 +804,9 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
       final emProducao = situacao == 'EM_PRODUCAO';
       await _mostrarResultado(
         sucesso: true,
-        titulo: emProducao ? 'Produto em produção' : 'Produto entregue',
+        titulo: emProducao ? 'Produto em preparação' : 'Produto entregue',
         mensagem: emProducao
-            ? 'O produto foi enviado para a produção.'
+            ? 'O produto foi enviado para a preparação.'
             : 'O produto foi marcado como entregue.',
       );
 
