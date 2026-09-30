@@ -268,7 +268,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
   Future<void> _mostrarResultado({
     required bool sucesso,
     required String titulo,
-    required String mensagem,
+    String? mensagem,
   }) async {
     if (!mounted) return;
 
@@ -300,17 +300,19 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
                   fontWeight: FontWeight.w900,
                 ),
               ),
-              const SizedBox(height: 10),
-              Text(
-                mensagem,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  height: 1.4,
+              if (mensagem?.isNotEmpty ?? false) ...[
+                const SizedBox(height: 10),
+                Text(
+                  mensagem!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    height: 1.4,
+                  ),
                 ),
-              ),
+              ],
             ],
           ),
           actionsAlignment: MainAxisAlignment.center,
@@ -893,7 +895,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
         titulo: emProducao ? 'Produto em preparação' : 'Produto entregue',
         mensagem: emProducao
             ? 'O produto foi enviado para a preparação.'
-            : 'O produto foi marcado como entregue.',
+            : null,
       );
 
       await _prepararNovaLeitura();
