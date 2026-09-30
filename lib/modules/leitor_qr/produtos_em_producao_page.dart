@@ -6,8 +6,42 @@ import '../../core/theme/clubbar_colors.dart';
 import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/clubbar_app_bar.dart';
 
+enum ProdutosControleBarFiltro { vendidos, validados, preparando, entregues }
+
+extension on ProdutosControleBarFiltro {
+  String get apiValue => switch (this) {
+    ProdutosControleBarFiltro.vendidos => 'VENDIDOS',
+    ProdutosControleBarFiltro.validados => 'VALIDADOS',
+    ProdutosControleBarFiltro.preparando => 'EM_PRODUCAO',
+    ProdutosControleBarFiltro.entregues => 'ENTREGUE',
+  };
+
+  String get titulo => switch (this) {
+    ProdutosControleBarFiltro.vendidos => 'Produtos vendidos',
+    ProdutosControleBarFiltro.validados => 'Produtos validados',
+    ProdutosControleBarFiltro.preparando => 'Preparando',
+    ProdutosControleBarFiltro.entregues => 'Produtos entregues',
+  };
+
+  String get mensagemVazia => switch (this) {
+    ProdutosControleBarFiltro.vendidos => 'Nenhum produto vendido.',
+    ProdutosControleBarFiltro.validados => 'Nenhum produto validado.',
+    ProdutosControleBarFiltro.preparando => 'Nenhum produto preparando.',
+    ProdutosControleBarFiltro.entregues => 'Nenhum produto entregue.',
+  };
+
+  IconData get icone => switch (this) {
+    ProdutosControleBarFiltro.vendidos => Icons.shopping_bag_outlined,
+    ProdutosControleBarFiltro.validados => Icons.verified_outlined,
+    ProdutosControleBarFiltro.preparando => Icons.restaurant_menu_rounded,
+    ProdutosControleBarFiltro.entregues => Icons.check_circle_outline_rounded,
+  };
+}
+
 class ProdutosEmProducaoPage extends StatefulWidget {
-  const ProdutosEmProducaoPage({super.key});
+  const ProdutosEmProducaoPage({super.key, required this.filtro});
+
+  final ProdutosControleBarFiltro filtro;
 
   @override
   State<ProdutosEmProducaoPage> createState() => _ProdutosEmProducaoPageState();
@@ -31,7 +65,9 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
       _erro = null;
     });
     try {
-      final itens = await ApiService.listarProdutosEmProducao();
+      final itens = await ApiService.listarProdutosControleBar(
+        filtro: widget.filtro.apiValue,
+      );
       if (!mounted) return;
       setState(() => _itens = itens);
     } catch (e) {
@@ -144,26 +180,28 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
               'Observação',
               observacao.isEmpty ? 'Sem observação' : observacao,
             ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton.icon(
-                onPressed: entregando ? null : () => _entregar(item),
-                icon: entregando
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : const Icon(Icons.check_circle_outline_rounded),
-                label: Text(entregando ? 'Entregando...' : 'Entregue'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ClubbarColors.primaria,
-                  foregroundColor: Colors.white,
+            if (widget.filtro == ProdutosControleBarFiltro.preparando) ...[
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: entregando ? null : () => _entregar(item),
+                  icon: entregando
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.check_circle_outline_rounded),
+                  label: Text(entregando ? 'Entregando...' : 'Entregue'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ClubbarColors.primaria,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),
@@ -213,8 +251,8 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                     color: Colors.grey,
                   ),
                   const SizedBox(height: 14),
-                  const Text(
-                    'Não foi possível carregar os produtos em preparação.',
+                  Text(
+                    'Não foi possível carregar ${widget.filtro.titulo.toLowerCase()}.',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
                   ),
@@ -231,32 +269,37 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
             : _itens.isEmpty
             ? ListView(
                 padding: const EdgeInsets.all(24),
-                children: const [
-                  SizedBox(height: 110),
-                  Icon(
-                    Icons.restaurant_menu_rounded,
-                    size: 70,
-                    color: Colors.black38,
-                  ),
-                  SizedBox(height: 16),
+                children: [
+                  const SizedBox(height: 110),
+                  Icon(widget.filtro.icone, size: 70, color: Colors.black38),
+                  const SizedBox(height: 16),
                   Text(
-                    'Nenhum produto em preparação.',
+                    widget.filtro.mensagemVazia,
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
                 ],
               )
             : ListView(
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
                 children: [
-                  const Text(
-                    'Produtos em preparação',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900),
+                  Text(
+                    widget.filtro.titulo,
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                    ),
                   ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'Clique em Entregue quando o produto estiver pronto e for entregue ao cliente.',
-                  ),
+                  if (widget.filtro ==
+                      ProdutosControleBarFiltro.preparando) ...[
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Clique em Entregue quando o produto estiver pronto e for entregue ao cliente.',
+                    ),
+                  ],
                   const SizedBox(height: 18),
                   ..._itens.map(_card),
                 ],
