@@ -133,11 +133,14 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
     );
   }
 
-  Future<void> abrirProdutosEmProducao() async {
+  Future<void> abrirProdutosControleBar(
+    ProdutosControleBarFiltro filtro,
+  ) async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const ProdutosEmProducaoPage()),
+      MaterialPageRoute(builder: (_) => ProdutosEmProducaoPage(filtro: filtro)),
     );
+    if (mounted) await carregarDados();
   }
 
   Future<void> sair() async {
@@ -279,38 +282,49 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
     required int quantidade,
     required IconData icone,
     required Color cor,
+    required VoidCallback onTap,
   }) {
     return Expanded(
-      child: Container(
-        height: 82,
-        margin: const EdgeInsets.symmetric(horizontal: 3),
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        decoration: BoxDecoration(
-          color: cor.withValues(alpha: 0.11),
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: cor.withValues(alpha: 0.30)),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icone, color: cor, size: 18),
-            const SizedBox(height: 2),
-            Text(
-              '$quantidade',
-              style: TextStyle(
-                color: cor,
-                fontSize: 19,
-                fontWeight: FontWeight.w900,
-              ),
+      child: Semantics(
+        button: true,
+        label: 'Abrir produtos $titulo',
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            height: 82,
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+            decoration: BoxDecoration(
+              color: cor.withValues(alpha: 0.11),
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: cor.withValues(alpha: 0.30)),
             ),
-            Text(
-              titulo,
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icone, color: cor, size: 18),
+                const SizedBox(height: 2),
+                Text(
+                  '$quantidade',
+                  style: TextStyle(
+                    color: cor,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                Text(
+                  titulo,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -324,24 +338,32 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
           quantidade: _numeroResumo('vendidos'),
           icone: Icons.shopping_bag_outlined,
           cor: Colors.blue.shade700,
+          onTap: () =>
+              abrirProdutosControleBar(ProdutosControleBarFiltro.vendidos),
         ),
         _cardResumo(
           titulo: 'Validados',
           quantidade: _numeroResumo('validados'),
           icone: Icons.verified_outlined,
           cor: ClubbarColors.primaria,
+          onTap: () =>
+              abrirProdutosControleBar(ProdutosControleBarFiltro.validados),
         ),
         _cardResumo(
-          titulo: 'Em preparação',
+          titulo: 'Preparando',
           quantidade: _numeroResumo('em_preparacao'),
           icone: Icons.restaurant_rounded,
           cor: Colors.orange.shade800,
+          onTap: () =>
+              abrirProdutosControleBar(ProdutosControleBarFiltro.preparando),
         ),
         _cardResumo(
           titulo: 'Entregues',
           quantidade: _numeroResumo('entregues'),
           icone: Icons.check_circle_outline_rounded,
           cor: Colors.teal.shade700,
+          onTap: () =>
+              abrirProdutosControleBar(ProdutosControleBarFiltro.entregues),
         ),
       ],
     );
@@ -468,28 +490,6 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 14),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: abrirProdutosEmProducao,
-                    icon: const Icon(Icons.restaurant_menu_rounded),
-                    label: const Text(
-                      'Produtos em preparação',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade700,
-                      foregroundColor: Colors.white,
                     ),
                   ),
                 ),
