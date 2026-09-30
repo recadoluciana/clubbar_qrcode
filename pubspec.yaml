@@ -2,7 +2,7 @@ name: clubbar_qrcode
 description: "Leitura operacional de QR Codes do Clubbar."
 publish_to: 'none'
 
-version: 1.0.0+4
+version: 1.0.0+5
 
 environment:
   sdk: ^3.11.4
