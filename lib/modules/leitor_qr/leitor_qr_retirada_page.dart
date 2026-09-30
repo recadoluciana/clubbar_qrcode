@@ -604,105 +604,191 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
                 ),
               ),
               actions: [
-                ElevatedButton.icon(
-                  onPressed: confirmandoRetirada
-                      ? null
-                      : () {
-                          Navigator.pop(dialogContext, false);
-                        },
-                  icon: Icon(
-                    jaUtilizado ? Icons.close_rounded : Icons.cancel_rounded,
-                    size: 20,
-                  ),
-                  label: Text(
-                    jaUtilizado ? 'Fechar' : 'Cancelar',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade600,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    minimumSize: const Size(120, 46),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                ),
-
-                if (!jaUtilizado)
-                  ElevatedButton.icon(
-                    onPressed: confirmandoRetirada
-                        ? null
-                        : () async {
-                            setDialogState(() => confirmandoRetirada = true);
-                            final sucesso = await _atualizarControleBar(
-                              produto: produto,
-                              situacao: 'ENTREGUE',
-                              dialogContext: dialogContext,
-                            );
-                            if (dialogContext.mounted && !sucesso) {
-                              setDialogState(() => confirmandoRetirada = false);
-                            }
-                          },
-                    icon: confirmandoRetirada
-                        ? const SizedBox(
-                            width: 19,
-                            height: 19,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
+                SizedBox(
+                  width: double.infinity,
+                  child: jaUtilizado
+                      ? Center(
+                          child: SizedBox(
+                            height: 48,
+                            child: ElevatedButton.icon(
+                              onPressed: confirmandoRetirada
+                                  ? null
+                                  : () => Navigator.pop(dialogContext, false),
+                              icon: const Icon(Icons.close_rounded, size: 20),
+                              label: const Text(
+                                'Fechar',
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red.shade600,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 26,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
                             ),
-                          )
-                        : const Icon(Icons.check_circle_outline_rounded),
-                    label: Text(
-                      confirmandoRetirada ? 'Entregando...' : 'Entregar',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade700,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                  ),
-
-                if (!jaUtilizado) const SizedBox(width: 8),
-
-                if (!jaUtilizado)
-                  ElevatedButton.icon(
-                    onPressed: confirmandoRetirada
-                        ? null
-                        : () async {
-                            final dados = await _pedirDadosDeProducao();
-                            if (dados == null || !dialogContext.mounted) return;
-                            setDialogState(() => confirmandoRetirada = true);
-                            final sucesso = await _atualizarControleBar(
-                              produto: produto,
-                              situacao: 'EM_PRODUCAO',
-                              nrMesa: dados['nrMesa'],
-                              observacao: dados['observacao'],
-                              dialogContext: dialogContext,
-                            );
-                            if (dialogContext.mounted && !sucesso) {
-                              setDialogState(() => confirmandoRetirada = false);
-                            }
-                          },
-                    icon: const Icon(Icons.restaurant_rounded),
-                    label: const Text(
-                      'Produzir',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade700,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                  ),
+                          ),
+                        )
+                      : Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 52,
+                                    child: ElevatedButton.icon(
+                                      onPressed: confirmandoRetirada
+                                          ? null
+                                          : () async {
+                                              setDialogState(
+                                                () =>
+                                                    confirmandoRetirada = true,
+                                              );
+                                              final sucesso =
+                                                  await _atualizarControleBar(
+                                                    produto: produto,
+                                                    situacao: 'ENTREGUE',
+                                                    dialogContext:
+                                                        dialogContext,
+                                                  );
+                                              if (dialogContext.mounted &&
+                                                  !sucesso) {
+                                                setDialogState(
+                                                  () => confirmandoRetirada =
+                                                      false,
+                                                );
+                                              }
+                                            },
+                                      icon: confirmandoRetirada
+                                          ? const SizedBox(
+                                              width: 19,
+                                              height: 19,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                                color: Colors.white,
+                                              ),
+                                            )
+                                          : const Icon(
+                                              Icons
+                                                  .check_circle_outline_rounded,
+                                            ),
+                                      label: Text(
+                                        confirmandoRetirada
+                                            ? 'Entregando...'
+                                            : 'Entregar',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green.shade700,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: SizedBox(
+                                    height: 52,
+                                    child: ElevatedButton.icon(
+                                      onPressed: confirmandoRetirada
+                                          ? null
+                                          : () async {
+                                              final dados =
+                                                  await _pedirDadosDeProducao();
+                                              if (dados == null ||
+                                                  !dialogContext.mounted) {
+                                                return;
+                                              }
+                                              setDialogState(
+                                                () =>
+                                                    confirmandoRetirada = true,
+                                              );
+                                              final sucesso =
+                                                  await _atualizarControleBar(
+                                                    produto: produto,
+                                                    situacao: 'EM_PRODUCAO',
+                                                    nrMesa: dados['nrMesa'],
+                                                    observacao:
+                                                        dados['observacao'],
+                                                    dialogContext:
+                                                        dialogContext,
+                                                  );
+                                              if (dialogContext.mounted &&
+                                                  !sucesso) {
+                                                setDialogState(
+                                                  () => confirmandoRetirada =
+                                                      false,
+                                                );
+                                              }
+                                            },
+                                      icon: const Icon(
+                                        Icons.restaurant_rounded,
+                                      ),
+                                      label: const Text(
+                                        'Preparar',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.orange.shade700,
+                                        foregroundColor: Colors.white,
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            14,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            SizedBox(
+                              height: 46,
+                              child: ElevatedButton.icon(
+                                onPressed: confirmandoRetirada
+                                    ? null
+                                    : () => Navigator.pop(dialogContext, false),
+                                icon: const Icon(
+                                  Icons.cancel_rounded,
+                                  size: 20,
+                                ),
+                                label: const Text(
+                                  'Cancelar',
+                                  style: TextStyle(fontWeight: FontWeight.w700),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red.shade600,
+                                  foregroundColor: Colors.white,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 26,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
               ],
             );
           },
@@ -759,7 +845,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
               'observacao': observacaoController.text.trim(),
             }),
             icon: const Icon(Icons.restaurant_rounded),
-            label: const Text('Produzir'),
+            label: const Text('Preparar'),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange.shade700,
               foregroundColor: Colors.white,
@@ -1000,7 +1086,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
 
       appBar: AppBar(
         title: const Text(
-          'Leitor de retirada',
+          'Leitor de produto',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.black,
