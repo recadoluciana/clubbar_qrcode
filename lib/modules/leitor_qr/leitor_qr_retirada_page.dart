@@ -269,6 +269,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     required bool sucesso,
     required String titulo,
     String? mensagem,
+    double tamanhoMensagem = 15,
     Color? corSucesso,
     Duration? fecharAutomaticamente,
   }) async {
@@ -305,23 +306,24 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                titulo,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 19,
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              if (mensagem?.isNotEmpty ?? false) ...[
-                const SizedBox(height: 10),
+              if (titulo.isNotEmpty)
                 Text(
-                  mensagem!,
+                  titulo,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 15,
+                    fontSize: 19,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              if (mensagem?.isNotEmpty ?? false) ...[
+                SizedBox(height: titulo.isNotEmpty ? 10 : 2),
+                Text(
+                  mensagem!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: tamanhoMensagem,
                     fontWeight: FontWeight.w600,
                     height: 1.4,
                   ),
@@ -908,10 +910,11 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
       final emProducao = situacao == 'EM_PRODUCAO';
       await _mostrarResultado(
         sucesso: true,
-        titulo: emProducao ? 'Produto em preparação' : 'Produto entregue',
+        titulo: emProducao ? '' : 'Produto entregue',
         mensagem: emProducao
             ? 'O produto foi enviado para a preparação.'
             : null,
+        tamanhoMensagem: emProducao ? 17 : 15,
         corSucesso: emProducao ? Colors.orange.shade700 : null,
         fecharAutomaticamente: emProducao ? null : const Duration(seconds: 2),
       );
