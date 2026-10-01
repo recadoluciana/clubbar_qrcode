@@ -79,6 +79,14 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     await _audioPlayer.play(AssetSource('sounds/beep.mp3'));
   }
 
+  Future<void> _ignorarFalha(Future<void> operacao) async {
+    try {
+      await operacao;
+    } catch (_) {
+      // A leitura do QR Code não deve depender da câmera ou do áudio concluir.
+    }
+  }
+
   Future<void> _mostrarDiagnostico({
     required String titulo,
     required String conteudo,
@@ -365,8 +373,10 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
       processando = true;
     });
 
-    await _scannerController.stop();
-    await tocarBeep();
+    // No Safari do iPhone, a pausa da câmera pode não concluir. Como o estado
+    // `processando` já bloqueia leituras duplicadas, a consulta pode seguir.
+    unawaited(_ignorarFalha(_scannerController.stop()));
+    unawaited(_ignorarFalha(tocarBeep()));
 
     try {
       final token = _extrairToken(

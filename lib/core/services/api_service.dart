@@ -162,7 +162,9 @@ class ApiService {
       );
 
       final response = await _tratarRespostaDeAutenticacao(
-        await http.get(uri, headers: await _headers()),
+        await http
+            .get(uri, headers: await _headers())
+            .timeout(const Duration(seconds: 15)),
       );
 
       final texto = response.body.trim();
