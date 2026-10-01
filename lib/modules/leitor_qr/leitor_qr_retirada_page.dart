@@ -269,14 +269,28 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     required bool sucesso,
     required String titulo,
     String? mensagem,
+    Color? corSucesso,
+    Duration? fecharAutomaticamente,
   }) async {
     if (!mounted) return;
 
+    var fechamentoAgendado = false;
     await showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
-        final cor = sucesso ? Colors.green.shade700 : Colors.red.shade700;
+        final cor = sucesso
+            ? (corSucesso ?? Colors.green.shade700)
+            : Colors.red.shade700;
+
+        if (fecharAutomaticamente != null && !fechamentoAgendado) {
+          fechamentoAgendado = true;
+          Future<void>.delayed(fecharAutomaticamente, () {
+            if (dialogContext.mounted) {
+              Navigator.of(dialogContext).pop();
+            }
+          });
+        }
 
         return AlertDialog(
           backgroundColor: cor,
@@ -316,25 +330,27 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
             ],
           ),
           actionsAlignment: MainAxisAlignment.center,
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: cor,
-                backgroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 11,
-                ),
-              ),
-              child: const Text(
-                'Continuar',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
+          actions: fecharAutomaticamente == null
+              ? [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: cor,
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 11,
+                      ),
+                    ),
+                    child: const Text(
+                      'Continuar',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ]
+              : const [],
         );
       },
     );
@@ -896,6 +912,8 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
         mensagem: emProducao
             ? 'O produto foi enviado para a preparação.'
             : null,
+        corSucesso: emProducao ? Colors.orange.shade700 : null,
+        fecharAutomaticamente: emProducao ? null : const Duration(seconds: 2),
       );
 
       await _prepararNovaLeitura();
