@@ -6,35 +6,27 @@ import '../../core/theme/clubbar_colors.dart';
 import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/clubbar_app_bar.dart';
 
-enum ProdutosControleBarFiltro { vendidos, validados, preparando, entregues }
+enum ProdutosControleBarFiltro { pendentes, preparando }
 
 extension on ProdutosControleBarFiltro {
   String get apiValue => switch (this) {
-    ProdutosControleBarFiltro.vendidos => 'VENDIDOS',
-    ProdutosControleBarFiltro.validados => 'VALIDADOS',
+    ProdutosControleBarFiltro.pendentes => 'PENDENTES',
     ProdutosControleBarFiltro.preparando => 'EM_PRODUCAO',
-    ProdutosControleBarFiltro.entregues => 'ENTREGUE',
   };
 
   String get titulo => switch (this) {
-    ProdutosControleBarFiltro.vendidos => 'Produtos vendidos',
-    ProdutosControleBarFiltro.validados => 'Produtos validados',
-    ProdutosControleBarFiltro.preparando => 'Preparando',
-    ProdutosControleBarFiltro.entregues => 'Produtos entregues',
+    ProdutosControleBarFiltro.pendentes => 'Produtos pendentes',
+    ProdutosControleBarFiltro.preparando => 'Em preparação',
   };
 
   String get mensagemVazia => switch (this) {
-    ProdutosControleBarFiltro.vendidos => 'Nenhum produto vendido.',
-    ProdutosControleBarFiltro.validados => 'Nenhum produto validado.',
-    ProdutosControleBarFiltro.preparando => 'Nenhum produto preparando.',
-    ProdutosControleBarFiltro.entregues => 'Nenhum produto entregue.',
+    ProdutosControleBarFiltro.pendentes => 'Nenhum produto pendente.',
+    ProdutosControleBarFiltro.preparando => 'Nenhum produto em preparação.',
   };
 
   IconData get icone => switch (this) {
-    ProdutosControleBarFiltro.vendidos => Icons.shopping_bag_outlined,
-    ProdutosControleBarFiltro.validados => Icons.verified_outlined,
+    ProdutosControleBarFiltro.pendentes => Icons.shopping_bag_outlined,
     ProdutosControleBarFiltro.preparando => Icons.restaurant_menu_rounded,
-    ProdutosControleBarFiltro.entregues => Icons.check_circle_outline_rounded,
   };
 }
 

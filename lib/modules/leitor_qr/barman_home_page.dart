@@ -334,36 +334,20 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
     return Row(
       children: [
         _cardResumo(
-          titulo: 'Vendidos',
-          quantidade: _numeroResumo('vendidos'),
+          titulo: 'Pendentes',
+          quantidade: _numeroResumo('pendentes'),
           icone: Icons.shopping_bag_outlined,
           cor: Colors.blue.shade700,
           onTap: () =>
-              abrirProdutosControleBar(ProdutosControleBarFiltro.vendidos),
+              abrirProdutosControleBar(ProdutosControleBarFiltro.pendentes),
         ),
         _cardResumo(
-          titulo: 'Validados',
-          quantidade: _numeroResumo('validados'),
-          icone: Icons.verified_outlined,
-          cor: ClubbarColors.primaria,
-          onTap: () =>
-              abrirProdutosControleBar(ProdutosControleBarFiltro.validados),
-        ),
-        _cardResumo(
-          titulo: 'Preparando',
+          titulo: 'Em preparação',
           quantidade: _numeroResumo('em_preparacao'),
           icone: Icons.restaurant_rounded,
           cor: Colors.orange.shade800,
           onTap: () =>
               abrirProdutosControleBar(ProdutosControleBarFiltro.preparando),
-        ),
-        _cardResumo(
-          titulo: 'Entregues',
-          quantidade: _numeroResumo('entregues'),
-          icone: Icons.check_circle_outline_rounded,
-          cor: Colors.teal.shade700,
-          onTap: () =>
-              abrirProdutosControleBar(ProdutosControleBarFiltro.entregues),
         ),
       ],
     );
