@@ -384,7 +384,6 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     if (!kIsWeb) {
       unawaited(_ignorarFalha(_scannerController.stop()));
     }
-    unawaited(_ignorarFalha(tocarBeep()));
 
     try {
       final token = _extrairToken(
@@ -420,6 +419,13 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
         );
         await _prepararNovaLeitura();
         return;
+      }
+
+      if (_produtoJaUtilizado(produto)) {
+        unawaited(_ignorarFalha(tocarErro()));
+        unawaited(_ignorarFalha(vibrarErro()));
+      } else {
+        unawaited(_ignorarFalha(tocarBeep()));
       }
 
       await _abrirConfirmacaoProduto(produto: produto);
@@ -934,7 +940,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
             : null,
         tamanhoMensagem: emProducao ? 17 : 15,
         corSucesso: emProducao ? Colors.orange.shade700 : null,
-        fecharAutomaticamente: emProducao ? null : const Duration(seconds: 1),
+        fecharAutomaticamente: const Duration(seconds: 1),
       );
 
       await _prepararNovaLeitura();
