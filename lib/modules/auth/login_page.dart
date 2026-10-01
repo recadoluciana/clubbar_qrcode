@@ -107,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 14),
                   const Text(
-                    'Clubbar QrCode',
+                    'Clubbar QRCode',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900),
                   ),
