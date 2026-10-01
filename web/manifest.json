@@ -1,6 +1,6 @@
 {
-    "name": "Clubbar QrCode",
-    "short_name": "Clubbar QrCode",
+    "name": "Clubbar QRCode",
+    "short_name": "Clubbar QRCode",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#000000",
