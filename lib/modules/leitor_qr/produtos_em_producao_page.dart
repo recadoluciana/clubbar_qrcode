@@ -265,18 +265,20 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
 
   @override
   Widget build(BuildContext context) {
-    final exibirCabecalhoPendente =
-        widget.filtro == ProdutosControleBarFiltro.pendentes;
+    final tituloCabecalho = widget.filtro.titulo;
+    final subtituloCabecalho =
+        widget.filtro == ProdutosControleBarFiltro.pendentes
+        ? 'Produtos comprados e ainda não utilizados'
+        : 'Clique em Entregue quando o produto estiver pronto e for entregue ao cliente.';
 
     return Scaffold(
       appBar: const ClubbarAppBar(mostrarVoltar: true),
       body: Column(
         children: [
-          if (exibirCabecalhoPendente)
-            const ClubbarPageHeader(
-              titulo: 'Produtos pendentes',
-              subtitulo: 'Produtos comprados e ainda não utilizados',
-            ),
+          ClubbarPageHeader(
+            titulo: tituloCabecalho,
+            subtitulo: subtituloCabecalho,
+          ),
           Expanded(
             child: RefreshIndicator(
               onRefresh: _carregar,
@@ -334,25 +336,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                     )
                   : ListView(
                       padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
-                      children: [
-                        if (!exibirCabecalhoPendente)
-                          Text(
-                            widget.filtro.titulo,
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w900,
-                            ),
-                          ),
-                        if (widget.filtro ==
-                            ProdutosControleBarFiltro.preparando) ...[
-                          const SizedBox(height: 5),
-                          const Text(
-                            'Clique em Entregue quando o produto estiver pronto e for entregue ao cliente.',
-                          ),
-                        ],
-                        const SizedBox(height: 18),
-                        ..._itens.map(_card),
-                      ],
+                      children: [..._itens.map(_card)],
                     ),
             ),
           ),
