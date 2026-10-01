@@ -105,7 +105,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
     final texto = '${valor ?? ''}'.trim();
     final data = DateTime.tryParse(texto);
     if (data == null) return 'Não informada';
-    return DateFormat('dd/MM/yyyy às HH:mm', 'pt_BR').format(data);
+    return DateFormat("dd/MM/yyyy 'às' HH:mm", 'pt_BR').format(data);
   }
 
   String _formatarValidade(dynamic valor) {
@@ -167,6 +167,13 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                           fontWeight: FontWeight.w900,
                         ),
                       ),
+                      if (pendente) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Venda: #${item['venda_id'] ?? 'Não informada'}',
+                          style: TextStyle(color: Colors.grey.shade700),
+                        ),
+                      ],
                       if (!pendente) ...[
                         const SizedBox(height: 4),
                         Text(
@@ -197,12 +204,6 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                 Icons.event_available_outlined,
                 'Validade',
                 _formatarValidade(item['dtvalidade']),
-              ),
-              const SizedBox(height: 9),
-              _linha(
-                Icons.receipt_long_outlined,
-                'Venda',
-                '#${item['venda_id'] ?? 'Não informada'}',
               ),
             ] else
               _linha(
@@ -264,82 +265,98 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final exibirCabecalhoPendente =
+        widget.filtro == ProdutosControleBarFiltro.pendentes;
+
     return Scaffold(
       appBar: const ClubbarAppBar(mostrarVoltar: true),
-      body: RefreshIndicator(
-        onRefresh: _carregar,
-        child: _carregando
-            ? const Center(child: CircularProgressIndicator())
-            : _erro != null
-            ? ListView(
-                padding: const EdgeInsets.all(24),
-                children: [
-                  const SizedBox(height: 80),
-                  const Icon(
-                    Icons.cloud_off_rounded,
-                    size: 62,
-                    color: Colors.grey,
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    'Não foi possível carregar ${widget.filtro.titulo.toLowerCase()}.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(_erro!, textAlign: TextAlign.center),
-                  const SizedBox(height: 18),
-                  ElevatedButton.icon(
-                    onPressed: _carregar,
-                    icon: const Icon(Icons.refresh_rounded),
-                    label: const Text('Tentar novamente'),
-                  ),
-                ],
-              )
-            : _itens.isEmpty
-            ? ListView(
-                padding: const EdgeInsets.all(24),
-                children: [
-                  const SizedBox(height: 110),
-                  Icon(widget.filtro.icone, size: 70, color: Colors.black38),
-                  const SizedBox(height: 16),
-                  Text(
-                    widget.filtro.mensagemVazia,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              )
-            : ListView(
-                padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
-                children: [
-                  if (widget.filtro == ProdutosControleBarFiltro.pendentes)
-                    const ClubbarPageHeader(
-                      titulo: 'Produtos pendentes',
-                      subtitulo: 'Produtos comprados e ainda não utilizados',
+      body: Column(
+        children: [
+          if (exibirCabecalhoPendente)
+            const ClubbarPageHeader(
+              titulo: 'Produtos pendentes',
+              subtitulo: 'Produtos comprados e ainda não utilizados',
+            ),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _carregar,
+              child: _carregando
+                  ? const Center(child: CircularProgressIndicator())
+                  : _erro != null
+                  ? ListView(
+                      padding: const EdgeInsets.all(24),
+                      children: [
+                        const SizedBox(height: 80),
+                        const Icon(
+                          Icons.cloud_off_rounded,
+                          size: 62,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          'Não foi possível carregar ${widget.filtro.titulo.toLowerCase()}.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(_erro!, textAlign: TextAlign.center),
+                        const SizedBox(height: 18),
+                        ElevatedButton.icon(
+                          onPressed: _carregar,
+                          icon: const Icon(Icons.refresh_rounded),
+                          label: const Text('Tentar novamente'),
+                        ),
+                      ],
                     )
-                  else
-                    Text(
-                      widget.filtro.titulo,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                      ),
+                  : _itens.isEmpty
+                  ? ListView(
+                      padding: const EdgeInsets.all(24),
+                      children: [
+                        const SizedBox(height: 110),
+                        Icon(
+                          widget.filtro.icone,
+                          size: 70,
+                          color: Colors.black38,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          widget.filtro.mensagemVazia,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ],
+                    )
+                  : ListView(
+                      padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
+                      children: [
+                        if (!exibirCabecalhoPendente)
+                          Text(
+                            widget.filtro.titulo,
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                        if (widget.filtro ==
+                            ProdutosControleBarFiltro.preparando) ...[
+                          const SizedBox(height: 5),
+                          const Text(
+                            'Clique em Entregue quando o produto estiver pronto e for entregue ao cliente.',
+                          ),
+                        ],
+                        const SizedBox(height: 18),
+                        ..._itens.map(_card),
+                      ],
                     ),
-                  if (widget.filtro ==
-                      ProdutosControleBarFiltro.preparando) ...[
-                    const SizedBox(height: 5),
-                    const Text(
-                      'Clique em Entregue quando o produto estiver pronto e for entregue ao cliente.',
-                    ),
-                  ],
-                  const SizedBox(height: 18),
-                  ..._itens.map(_card),
-                ],
-              ),
+            ),
+          ),
+        ],
       ),
     );
   }
