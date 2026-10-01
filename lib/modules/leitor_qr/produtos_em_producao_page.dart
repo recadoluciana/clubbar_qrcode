@@ -297,7 +297,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
               const SizedBox(height: 9),
               _linha(
                 Icons.person_pin_outlined,
-                'Preparado por',
+                'Validado por',
                 usuarioPreparacao.isEmpty ? 'Não informado' : usuarioPreparacao,
               ),
               const SizedBox(height: 16),
