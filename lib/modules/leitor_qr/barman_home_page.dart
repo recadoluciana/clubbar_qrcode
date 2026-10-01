@@ -28,7 +28,8 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
   bool carregando = true;
   String? erro;
 
-  Timer? _timer;
+  Timer? _relogioTimer;
+  Timer? _resumoTimer;
 
   @override
   void initState() {
@@ -36,18 +37,20 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
 
     carregarDados();
     iniciarRelogio();
+    iniciarAtualizacaoResumo();
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _relogioTimer?.cancel();
+    _resumoTimer?.cancel();
     super.dispose();
   }
 
   void iniciarRelogio() {
     _atualizarRelogio();
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+    _relogioTimer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
 
       setState(_atualizarRelogio);
@@ -56,6 +59,24 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
 
   void _atualizarRelogio() {
     dataHoraAtual = DateFormat('dd/MM/yyyy HH:mm:ss').format(DateTime.now());
+  }
+
+  void iniciarAtualizacaoResumo() {
+    _resumoTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      _atualizarResumoSilenciosamente();
+    });
+  }
+
+  Future<void> _atualizarResumoSilenciosamente() async {
+    if (!mounted || carregando) return;
+
+    try {
+      final dadosResumo = await ApiService.resumoControleBar();
+      if (!mounted) return;
+      setState(() => resumo = dadosResumo);
+    } catch (_) {
+      // Mantém os últimos números exibidos quando a conexão oscilar.
+    }
   }
 
   String _montarUrlImagem(String caminho) {
