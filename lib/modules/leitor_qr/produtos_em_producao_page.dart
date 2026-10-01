@@ -170,7 +170,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                       if (pendente) ...[
                         const SizedBox(height: 4),
                         Text(
-                          'Venda: #${item['venda_id'] ?? 'Não informada'}',
+                          'Ticket: #${item['itvenda_id'] ?? 'Não informado'}',
                           style: TextStyle(color: Colors.grey.shade700),
                         ),
                       ],
@@ -195,7 +195,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
             const SizedBox(height: 9),
             if (pendente) ...[
               _linha(
-                Icons.shopping_cart_outlined,
+                Icons.calendar_month_outlined,
                 'Compra',
                 _formatarDataHora(item['dtcompra']),
               ),
