@@ -916,7 +916,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
             : null,
         tamanhoMensagem: emProducao ? 17 : 15,
         corSucesso: emProducao ? Colors.orange.shade700 : null,
-        fecharAutomaticamente: emProducao ? null : const Duration(seconds: 2),
+        fecharAutomaticamente: emProducao ? null : const Duration(seconds: 1),
       );
 
       await _prepararNovaLeitura();
