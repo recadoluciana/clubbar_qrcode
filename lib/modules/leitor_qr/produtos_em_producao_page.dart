@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/config/api_config.dart';
 import '../../core/services/api_service.dart';
 import '../../core/theme/clubbar_colors.dart';
 import '../../core/widgets/app_snackbar.dart';
 import '../../core/widgets/clubbar_app_bar.dart';
+import '../../core/widgets/clubbar_page_header.dart';
 
 enum ProdutosControleBarFiltro { pendentes, preparando }
 
@@ -99,12 +101,27 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
     return ApiConfig.buildUrl(caminho);
   }
 
+  String _formatarDataHora(dynamic valor) {
+    final texto = '${valor ?? ''}'.trim();
+    final data = DateTime.tryParse(texto);
+    if (data == null) return 'Não informada';
+    return DateFormat('dd/MM/yyyy às HH:mm', 'pt_BR').format(data);
+  }
+
+  String _formatarValidade(dynamic valor) {
+    final texto = '${valor ?? ''}'.trim();
+    final data = DateTime.tryParse(texto);
+    if (data == null) return 'Sem validade';
+    return DateFormat('dd/MM/yyyy', 'pt_BR').format(data);
+  }
+
   Widget _card(Map<String, dynamic> item) {
     final id = int.tryParse('${item['itvenda_id']}') ?? 0;
     final mesa = '${item['nrmesa'] ?? ''}'.trim();
     final observacao = '${item['dsobsitvenda'] ?? ''}'.trim();
     final foto = _foto(item);
     final entregando = _entregando.contains(id);
+    final pendente = widget.filtro == ProdutosControleBarFiltro.pendentes;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
@@ -150,11 +167,13 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                           fontWeight: FontWeight.w900,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        mesa.isEmpty ? 'Mesa não informada' : 'Mesa: $mesa',
-                        style: TextStyle(color: Colors.grey.shade700),
-                      ),
+                      if (!pendente) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          mesa.isEmpty ? 'Mesa não informada' : 'Mesa: $mesa',
+                          style: TextStyle(color: Colors.grey.shade700),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -167,11 +186,30 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
               '${item['nmcliente'] ?? 'Não informado'}',
             ),
             const SizedBox(height: 9),
-            _linha(
-              Icons.notes_rounded,
-              'Observação',
-              observacao.isEmpty ? 'Sem observação' : observacao,
-            ),
+            if (pendente) ...[
+              _linha(
+                Icons.shopping_cart_outlined,
+                'Compra',
+                _formatarDataHora(item['dtcompra']),
+              ),
+              const SizedBox(height: 9),
+              _linha(
+                Icons.event_available_outlined,
+                'Validade',
+                _formatarValidade(item['dtvalidade']),
+              ),
+              const SizedBox(height: 9),
+              _linha(
+                Icons.receipt_long_outlined,
+                'Venda',
+                '#${item['venda_id'] ?? 'Não informada'}',
+              ),
+            ] else
+              _linha(
+                Icons.notes_rounded,
+                'Observação',
+                observacao.isEmpty ? 'Sem observação' : observacao,
+              ),
             if (widget.filtro == ProdutosControleBarFiltro.preparando) ...[
               const SizedBox(height: 16),
               SizedBox(
@@ -278,13 +316,19 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
             : ListView(
                 padding: const EdgeInsets.fromLTRB(16, 18, 16, 30),
                 children: [
-                  Text(
-                    widget.filtro.titulo,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
+                  if (widget.filtro == ProdutosControleBarFiltro.pendentes)
+                    const ClubbarPageHeader(
+                      titulo: 'Produtos pendentes',
+                      subtitulo: 'Produtos comprados e ainda não utilizados',
+                    )
+                  else
+                    Text(
+                      widget.filtro.titulo,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
-                  ),
                   if (widget.filtro ==
                       ProdutosControleBarFiltro.preparando) ...[
                     const SizedBox(height: 5),
