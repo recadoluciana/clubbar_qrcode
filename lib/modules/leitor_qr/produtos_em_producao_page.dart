@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -46,11 +48,21 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
   String? _erro;
   List<Map<String, dynamic>> _itens = const [];
   final Set<int> _entregando = <int>{};
+  Timer? _tempoPreparacaoTimer;
 
   @override
   void initState() {
     super.initState();
     _carregar();
+    _tempoPreparacaoTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _tempoPreparacaoTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _carregar() async {
@@ -113,6 +125,63 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
     final data = DateTime.tryParse(texto);
     if (data == null) return 'Sem validade';
     return DateFormat('dd/MM/yyyy', 'pt_BR').format(data);
+  }
+
+  Widget _linhaPreparacao(dynamic valor) {
+    final texto = '${valor ?? ''}'.trim();
+    final inicio = DateTime.tryParse(texto);
+    if (inicio == null) {
+      return _linha(
+        Icons.schedule_rounded,
+        'Preparação',
+        'Horário não informado',
+      );
+    }
+
+    final diferenca = DateTime.now().difference(inicio);
+    final minutos = diferenca.isNegative ? 0 : diferenca.inMinutes;
+    final cor = minutos > 30
+        ? Colors.red.shade700
+        : minutos > 20
+        ? Colors.orange.shade800
+        : ClubbarColors.primaria;
+
+    return Row(
+      children: [
+        Icon(Icons.schedule_rounded, size: 19, color: ClubbarColors.primaria),
+        const SizedBox(width: 8),
+        Expanded(
+          child: RichText(
+            text: TextSpan(
+              style: const TextStyle(color: Colors.black87, fontSize: 14),
+              children: [
+                const TextSpan(
+                  text: 'Preparação: ',
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
+                TextSpan(text: _formatarDataHora(inicio.toIso8601String())),
+              ],
+            ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+          decoration: BoxDecoration(
+            color: cor.withValues(alpha: 0.14),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: cor.withValues(alpha: 0.45)),
+          ),
+          child: Text(
+            '$minutos min',
+            style: TextStyle(
+              color: cor,
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget _card(Map<String, dynamic> item) {
@@ -212,6 +281,8 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                 observacao.isEmpty ? 'Sem observação' : observacao,
               ),
             if (widget.filtro == ProdutosControleBarFiltro.preparando) ...[
+              const SizedBox(height: 9),
+              _linhaPreparacao(item['dtpreparacao']),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -272,7 +343,16 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
         : 'Clique em Entregue quando o produto estiver pronto e for entregue ao cliente.';
 
     return Scaffold(
-      appBar: const ClubbarAppBar(mostrarVoltar: true),
+      appBar: ClubbarAppBar(
+        mostrarVoltar: true,
+        actions: [
+          IconButton(
+            tooltip: 'Atualizar',
+            onPressed: _carregando ? null : _carregar,
+            icon: const Icon(Icons.refresh_rounded),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           ClubbarPageHeader(
