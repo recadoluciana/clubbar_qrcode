@@ -188,6 +188,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
     final id = int.tryParse('${item['itvenda_id']}') ?? 0;
     final mesa = '${item['nrmesa'] ?? ''}'.trim();
     final observacao = '${item['dsobsitvenda'] ?? ''}'.trim();
+    final usuarioPreparacao = '${item['nmuserentregaitvenda'] ?? ''}'.trim();
     final foto = _foto(item);
     final entregando = _entregando.contains(id);
     final pendente = widget.filtro == ProdutosControleBarFiltro.pendentes;
@@ -229,6 +230,16 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (!pendente)
+                        Text(
+                          '#${item['itvenda_id'] ?? 'Não informado'}',
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      if (!pendente) const SizedBox(height: 2),
                       Text(
                         '${item['nmproduto'] ?? 'Produto Clubbar'}',
                         style: const TextStyle(
@@ -283,6 +294,12 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
             if (widget.filtro == ProdutosControleBarFiltro.preparando) ...[
               const SizedBox(height: 9),
               _linhaPreparacao(item['dtpreparacao']),
+              const SizedBox(height: 9),
+              _linha(
+                Icons.person_pin_outlined,
+                'Preparado por',
+                usuarioPreparacao.isEmpty ? 'Não informado' : usuarioPreparacao,
+              ),
               const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
@@ -340,7 +357,7 @@ class _ProdutosEmProducaoPageState extends State<ProdutosEmProducaoPage> {
     final subtituloCabecalho =
         widget.filtro == ProdutosControleBarFiltro.pendentes
         ? 'Produtos comprados e ainda não utilizados'
-        : 'Clique em Entregue quando o produto estiver pronto e for entregue ao cliente.';
+        : '${_itens.length} ${_itens.length == 1 ? 'produto em preparação.' : 'produtos em preparação.'}';
 
     return Scaffold(
       appBar: ClubbarAppBar(
