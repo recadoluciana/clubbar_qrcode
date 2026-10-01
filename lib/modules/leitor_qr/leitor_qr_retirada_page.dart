@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:vibration/vibration.dart';
@@ -264,6 +265,10 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
       lendoQr = true;
     });
 
+    // Na web a câmera permanece ativa: parar e iniciar novamente pode deixar
+    // o Safari do iPhone com uma operação de câmera pendente.
+    if (kIsWeb) return;
+
     await Future.delayed(const Duration(milliseconds: 350));
 
     try {
@@ -373,9 +378,12 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
       processando = true;
     });
 
-    // No Safari do iPhone, a pausa da câmera pode não concluir. Como o estado
-    // `processando` já bloqueia leituras duplicadas, a consulta pode seguir.
-    unawaited(_ignorarFalha(_scannerController.stop()));
+    // Na web, `processando` bloqueia leituras duplicadas durante a consulta.
+    // Evitamos pausar a câmera no Safari, pois uma parada pendente poderia
+    // interromper a próxima leitura depois que a tela já tivesse reiniciado.
+    if (!kIsWeb) {
+      unawaited(_ignorarFalha(_scannerController.stop()));
+    }
     unawaited(_ignorarFalha(tocarBeep()));
 
     try {
