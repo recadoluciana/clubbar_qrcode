@@ -152,6 +152,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
       context,
       MaterialPageRoute(builder: (_) => const LeitorQrRetiradaScreen()),
     );
+    if (mounted) await _atualizarResumoSilenciosamente();
   }
 
   Future<void> abrirProdutosControleBar(
