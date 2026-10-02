@@ -13,11 +13,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('pt_BR', null);
   Intl.defaultLocale = 'pt_BR';
-  runApp(const ClubbarQrCodeApp());
+  runApp(const ClubbarQRCodeApp());
 }
 
-class ClubbarQrCodeApp extends StatelessWidget {
-  const ClubbarQrCodeApp({super.key});
+class ClubbarQRCodeApp extends StatelessWidget {
+  const ClubbarQRCodeApp({super.key});
 
   @override
   Widget build(BuildContext context) {

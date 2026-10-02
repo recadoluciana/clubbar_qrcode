@@ -491,7 +491,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                     onPressed: abrirLeitorQr,
                     icon: const Icon(Icons.qr_code_scanner),
                     label: const Text(
-                      'Ler QrCode do Produto',
+                      'Ler QRCode do Produto',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
