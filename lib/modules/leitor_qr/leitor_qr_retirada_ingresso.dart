@@ -28,6 +28,11 @@ class _LeitorQrRetiradaIngressoScreenState
   late bool lendoQr;
 
   final AudioPlayer _audioPlayer = AudioPlayer();
+  final MobileScannerController _scannerController = MobileScannerController(
+    detectionSpeed: DetectionSpeed.noDuplicates,
+    facing: CameraFacing.back,
+    torchEnabled: false,
+  );
 
   @override
   void initState() {
@@ -429,6 +434,7 @@ class _LeitorQrRetiradaIngressoScreenState
 
   @override
   void dispose() {
+    _scannerController.dispose();
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -458,6 +464,7 @@ class _LeitorQrRetiradaIngressoScreenState
           ? Stack(
               children: [
                 MobileScanner(
+                  controller: _scannerController,
                   onDetect: (capture) {
                     final barcode = capture.barcodes.firstOrNull;
                     final raw = barcode?.rawValue;
@@ -478,6 +485,40 @@ class _LeitorQrRetiradaIngressoScreenState
                       ),
                       borderRadius: BorderRadius.circular(24),
                     ),
+                  ),
+                ),
+                Positioned(
+                  top: 20,
+                  right: 20,
+                  child: ValueListenableBuilder<MobileScannerState>(
+                    valueListenable: _scannerController,
+                    builder: (context, state, _) {
+                      if (state.torchState == TorchState.unavailable) {
+                        return const SizedBox.shrink();
+                      }
+
+                      final lanternaLigada = state.torchState == TorchState.on;
+                      return Material(
+                        color: lanternaLigada
+                            ? ClubbarColors.primaria
+                            : Colors.black.withValues(alpha: 0.72),
+                        shape: const CircleBorder(),
+                        child: IconButton(
+                          tooltip: lanternaLigada
+                              ? 'Desligar lanterna'
+                              : 'Ligar lanterna',
+                          color: lanternaLigada ? Colors.black : Colors.white,
+                          icon: Icon(
+                            lanternaLigada
+                                ? Icons.flashlight_on_rounded
+                                : Icons.flashlight_off_rounded,
+                          ),
+                          onPressed: processando
+                              ? null
+                              : () => _scannerController.toggleTorch(),
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],

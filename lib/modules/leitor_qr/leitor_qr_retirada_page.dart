@@ -1091,6 +1091,41 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
         ),
 
         Positioned(
+          top: 20,
+          right: 20,
+          child: ValueListenableBuilder<MobileScannerState>(
+            valueListenable: _scannerController,
+            builder: (context, state, _) {
+              if (state.torchState == TorchState.unavailable) {
+                return const SizedBox.shrink();
+              }
+
+              final lanternaLigada = state.torchState == TorchState.on;
+              return Material(
+                color: lanternaLigada
+                    ? ClubbarColors.primaria
+                    : Colors.black.withValues(alpha: 0.72),
+                shape: const CircleBorder(),
+                child: IconButton(
+                  tooltip: lanternaLigada
+                      ? 'Desligar lanterna'
+                      : 'Ligar lanterna',
+                  color: lanternaLigada ? Colors.black : Colors.white,
+                  icon: Icon(
+                    lanternaLigada
+                        ? Icons.flashlight_on_rounded
+                        : Icons.flashlight_off_rounded,
+                  ),
+                  onPressed: processando
+                      ? null
+                      : () => _scannerController.toggleTorch(),
+                ),
+              );
+            },
+          ),
+        ),
+
+        Positioned(
           left: 24,
           right: 24,
           bottom: 34,
