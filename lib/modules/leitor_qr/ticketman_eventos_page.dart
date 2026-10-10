@@ -71,7 +71,7 @@ class _TicketmanEventosHojePageState extends State<TicketmanEventosHojePage> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Eventos programados para hoje, ${DateFormat('dd/MM/yyyy').format(DateTime.now())}.',
+                  'Eventos que começam hoje ou ainda estão em andamento, ${DateFormat('dd/MM/yyyy').format(DateTime.now())}.',
                   style: const TextStyle(color: ClubbarColors.textoSecundario),
                 ),
                 const SizedBox(height: 16),
@@ -107,7 +107,7 @@ class _TicketmanEventosHojePageState extends State<TicketmanEventosHojePage> {
                           Icon(Icons.event_busy_outlined, size: 46),
                           SizedBox(height: 10),
                           Text(
-                            'Não há eventos programados para hoje.',
+                            'Não há eventos em andamento hoje.',
                             textAlign: TextAlign.center,
                           ),
                         ],
