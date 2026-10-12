@@ -366,6 +366,33 @@ class ApiService {
     return body;
   }
 
+  static Future<Map<String, dynamic>> listarEntregasPendentesMotoboy() async {
+    final usuarioId = await StorageService.getUsuarioId();
+    if (usuarioId == null || usuarioId == 0) {
+      throw Exception(
+        'Usuário responsável não identificado. Faça login novamente.',
+      );
+    }
+    final response = await _tratarRespostaDeAutenticacao(
+      await http.get(
+        Uri.parse(
+          '${ApiConfig.baseUrl}/entregas/motoboy/entregas-pendentes?usuario_id=$usuarioId',
+        ),
+        headers: await _headers(),
+      ),
+    );
+    final body = response.body.trim().isEmpty
+        ? <String, dynamic>{}
+        : Map<String, dynamic>.from(jsonDecode(response.body));
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+        body['detail']?.toString() ??
+            'Não foi possível carregar as entregas pendentes.',
+      );
+    }
+    return body;
+  }
+
   static Future<List<Map<String, dynamic>>> listarEventosHojeTicketman() async {
     final response = await get('/eventos/leitor-ingressos/hoje');
     final texto = response.body.trim();

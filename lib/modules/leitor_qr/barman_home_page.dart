@@ -7,6 +7,7 @@ import '../../core/services/storage_service.dart';
 import '../../core/theme/clubbar_colors.dart';
 import '../../core/widgets/clubbar_app_bar.dart';
 import '../auth/login_page.dart';
+import 'entregas_pendentes_page.dart';
 import 'leitor_qr_retirada_page.dart';
 import 'produtos_em_producao_page.dart';
 
@@ -166,6 +167,13 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
       MaterialPageRoute(builder: (_) => ProdutosEmProducaoPage(filtro: filtro)),
     );
     if (mounted) await carregarDados();
+  }
+
+  Future<void> abrirEntregasPendentes() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const EntregasPendentesPage()),
+    );
   }
 
   Future<void> sair() async {
@@ -492,6 +500,31 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                 if (cargoUsuario != 'MOTOBOY') ...[
                   _resumoProdutos(),
                   const SizedBox(height: 16),
+                ],
+                if (cargoUsuario == 'MOTOBOY') ...[
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: OutlinedButton.icon(
+                      onPressed: abrirEntregasPendentes,
+                      icon: const Icon(Icons.delivery_dining_rounded),
+                      label: const Text(
+                        'Entregas pendentes',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: ClubbarColors.primaria,
+                        side: const BorderSide(
+                          color: ClubbarColors.primaria,
+                          width: 1.5,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
                 ],
 
                 SizedBox(
