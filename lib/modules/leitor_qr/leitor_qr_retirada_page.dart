@@ -449,6 +449,8 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
   Future<void> _abrirConfirmacaoProduto({
     required Map<String, dynamic> produto,
   }) async {
+    final entrega =
+        (produto['tipo_operacao'] ?? '').toString().toUpperCase() == 'DELIVERY';
     final nomeProduto = _textoCampo(produto, [
       'nmproduto',
       'produto',
@@ -516,8 +518,12 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
                     Expanded(
                       child: Text(
                         jaUtilizado
-                            ? 'Produto já utilizado'
-                            : 'Produto disponível',
+                            ? (entrega
+                                  ? 'Entrega já confirmada'
+                                  : 'Produto já utilizado')
+                            : (entrega
+                                  ? 'Pedido pronto para entrega'
+                                  : 'Produto disponível'),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 19,
@@ -576,6 +582,21 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
                         titulo: 'Estabelecimento',
                         valor: nomeLoja,
                       ),
+
+                      if (entrega) ...[
+                        const SizedBox(height: 10),
+                        _linhaInformacao(
+                          icone: Icons.location_on_outlined,
+                          titulo: 'Endereço de entrega',
+                          valor: _textoCampo(produto, ['endereco']),
+                        ),
+                        const SizedBox(height: 10),
+                        _linhaInformacao(
+                          icone: Icons.shopping_bag_outlined,
+                          titulo: 'Itens',
+                          valor: _textoCampo(produto, ['itens_resumo']),
+                        ),
+                      ],
 
                       if (observacao.isNotEmpty) ...[
                         const SizedBox(height: 12),
@@ -724,7 +745,9 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
                                       label: Text(
                                         confirmandoRetirada
                                             ? 'Entregando...'
-                                            : 'Entregar',
+                                            : (entrega
+                                                  ? 'Confirmar entrega'
+                                                  : 'Entregar'),
                                         style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -747,7 +770,7 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
                                   child: SizedBox(
                                     height: 52,
                                     child: ElevatedButton.icon(
-                                      onPressed: confirmandoRetirada
+                                      onPressed: confirmandoRetirada || entrega
                                           ? null
                                           : () async {
                                               final dados =
@@ -781,9 +804,9 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
                                       icon: const Icon(
                                         Icons.restaurant_rounded,
                                       ),
-                                      label: const Text(
-                                        'Preparar',
-                                        style: TextStyle(
+                                      label: Text(
+                                        entrega ? 'Não aplicável' : 'Preparar',
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -911,6 +934,27 @@ class _LeitorQrRetiradaScreenState extends State<LeitorQrRetiradaScreen> {
     required BuildContext dialogContext,
   }) async {
     try {
+      final entrega =
+          (produto['tipo_operacao'] ?? '').toString().toUpperCase() ==
+          'DELIVERY';
+      if (entrega) {
+        final token = (produto['qrcode_token'] ?? '').toString().trim();
+        if (token.isEmpty) throw Exception('QR Code de entrega inválido.');
+        await ApiService.confirmarRetiradaPorToken(token: token);
+        if (!mounted || !dialogContext.mounted) return false;
+        Navigator.pop(dialogContext, true);
+        await tocarOk();
+        await vibrarSucesso();
+        if (!mounted) return false;
+        await _mostrarResultado(
+          sucesso: true,
+          titulo: 'Entrega confirmada',
+          mensagem: 'Pedido entregue e pagamento na entrega registrado.',
+          fecharAutomaticamente: const Duration(seconds: 2),
+        );
+        await _prepararNovaLeitura();
+        return true;
+      }
       final itvendaId = int.tryParse('${produto['itvenda_id'] ?? ''}');
       if (itvendaId == null) {
         throw Exception('Produto inválido para controle de preparação.');

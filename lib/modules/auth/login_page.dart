@@ -44,7 +44,7 @@ class _LoginPageState extends State<LoginPage> {
           .toUpperCase();
       final Widget? destino = cargo == 'TICKETMAN'
           ? const TicketmanHomePage()
-          : cargo == 'BARMAN' || cargo == 'WAITER'
+          : cargo == 'BARMAN' || cargo == 'WAITER' || cargo == 'MOTOBOY'
           ? const BarmanHomePage()
           : null;
 
@@ -53,7 +53,7 @@ class _LoginPageState extends State<LoginPage> {
         if (mounted) {
           AppSnackBar.erro(
             context,
-            'Este aplicativo é exclusivo para Barman, Waiter e Ticketman.',
+            'Este aplicativo é exclusivo para Barman, Waiter, Motoboy e Ticketman.',
           );
         }
         return;
@@ -169,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 18),
                   const Text(
-                    'Acesso exclusivo para Barman, Waiter e Ticketman.',
+                    'Acesso exclusivo para Barman, Waiter, Motoboy e Ticketman.',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 12,

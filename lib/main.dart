@@ -59,7 +59,10 @@ class _DecisorDeSessaoState extends State<_DecisorDeSessao> {
     final token = await StorageService.getToken();
     final cargo = (await StorageService.getCargo() ?? '').trim().toUpperCase();
     final operacional =
-        cargo == 'TICKETMAN' || cargo == 'BARMAN' || cargo == 'WAITER';
+        cargo == 'TICKETMAN' ||
+        cargo == 'BARMAN' ||
+        cargo == 'WAITER' ||
+        cargo == 'MOTOBOY';
     if (token != null && token.isNotEmpty && !operacional) {
       await StorageService.clearToken();
     }

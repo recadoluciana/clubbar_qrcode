@@ -68,7 +68,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
   }
 
   Future<void> _atualizarResumoSilenciosamente() async {
-    if (!mounted || carregando) return;
+    if (!mounted || carregando || cargoUsuario == 'MOTOBOY') return;
 
     try {
       final dadosResumo = await ApiService.resumoControleBar();
@@ -115,7 +115,10 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
       final dadosLoja = await ApiService.buscarLojaDoUsuario(
         usuarioId: usuarioId,
       );
-      final dadosResumo = await ApiService.resumoControleBar();
+      final cargoNormalizado = (cargo ?? 'BARMAN').trim().toUpperCase();
+      final dadosResumo = cargoNormalizado == 'MOTOBOY'
+          ? const <String, dynamic>{}
+          : await ApiService.resumoControleBar();
 
       final nomeLojaRecebido = (dadosLoja['nmloja'] ?? '').toString().trim();
 
@@ -125,7 +128,7 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
 
       setState(() {
         nomeUsuario = nome?.trim().isNotEmpty == true ? nome!.trim() : 'Barman';
-        cargoUsuario = (cargo ?? 'BARMAN').trim().toUpperCase();
+        cargoUsuario = cargoNormalizado;
 
         nomeLoja = nomeLojaRecebido.isNotEmpty
             ? nomeLojaRecebido
@@ -166,7 +169,11 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
   }
 
   Future<void> sair() async {
-    final tituloCargo = cargoUsuario == 'WAITER' ? 'Waiter' : 'Barman';
+    final tituloCargo = cargoUsuario == 'WAITER'
+        ? 'Waiter'
+        : cargoUsuario == 'MOTOBOY'
+        ? 'Motoboy'
+        : 'Barman';
     final confirmar = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -443,8 +450,8 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
 
                 const SizedBox(height: 16),
 
-                const Text(
-                  'Barman/Waiter',
+                Text(
+                  cargoUsuario == 'MOTOBOY' ? 'Motoboy' : 'Barman/Waiter',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -472,17 +479,20 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
 
                 const SizedBox(height: 12),
 
-                const Text(
-                  'Validação de produtos',
+                Text(
+                  cargoUsuario == 'MOTOBOY'
+                      ? 'Confirmação de entregas'
+                      : 'Validação de produtos',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 16, color: Colors.black54),
                 ),
 
                 const SizedBox(height: 14),
 
-                _resumoProdutos(),
-
-                const SizedBox(height: 16),
+                if (cargoUsuario != 'MOTOBOY') ...[
+                  _resumoProdutos(),
+                  const SizedBox(height: 16),
+                ],
 
                 SizedBox(
                   width: double.infinity,
@@ -490,9 +500,11 @@ class _BarmanHomePageState extends State<BarmanHomePage> {
                   child: ElevatedButton.icon(
                     onPressed: abrirLeitorQr,
                     icon: const Icon(Icons.qr_code_scanner),
-                    label: const Text(
-                      'Ler QrCode do Produto',
-                      style: TextStyle(
+                    label: Text(
+                      cargoUsuario == 'MOTOBOY'
+                          ? 'Ler QR Code de entrega'
+                          : 'Ler QR Code do Produto',
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
