@@ -57,7 +57,7 @@ class ClubbarAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 const SizedBox(width: 8),
                 const Text(
-                  'Clubbar QRCode',
+                  'Clubbar QR Code',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 17,
