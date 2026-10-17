@@ -208,30 +208,49 @@ class _TicketmanResumoEventoPageState extends State<TicketmanResumoEventoPage> {
     }
   }
 
-  Widget _total(String titulo, Object? valor, IconData icone, Color cor) =>
-      Expanded(
-        child: Card(
-          color: cor.withValues(alpha: 0.08),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-            child: Column(
-              children: [
-                Icon(icone, color: cor),
-                const SizedBox(height: 7),
-                Text(
-                  '$valor',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w900,
-                    color: cor,
-                  ),
-                ),
-                Text(titulo, textAlign: TextAlign.center),
-              ],
+  Widget _total(
+    String titulo,
+    Object? valor,
+    IconData icone,
+    Color cor,
+    String situacao,
+  ) => Expanded(
+    child: Card(
+      clipBehavior: Clip.antiAlias,
+      color: cor.withValues(alpha: 0.08),
+      child: InkWell(
+        onTap: () async {
+          await Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => TicketmanIngressosEventoPage(
+                eventoId: widget.eventoId,
+                situacao: situacao,
+              ),
             ),
+          );
+          if (mounted) await _carregar();
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          child: Column(
+            children: [
+              Icon(icone, color: cor),
+              const SizedBox(height: 7),
+              Text(
+                '$valor',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w900,
+                  color: cor,
+                ),
+              ),
+              Text(titulo, textAlign: TextAlign.center),
+            ],
           ),
         ),
-      );
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -343,18 +362,21 @@ class _TicketmanResumoEventoPageState extends State<TicketmanResumoEventoPage> {
                         evento?['vendidos'] ?? 0,
                         Icons.confirmation_number_outlined,
                         Colors.blue,
+                        'VENDIDOS',
                       ),
                       _total(
                         'Validados',
                         evento?['validados'] ?? 0,
                         Icons.verified_outlined,
                         ClubbarColors.primaria,
+                        'VALIDADOS',
                       ),
                       _total(
                         'Pendentes',
                         evento?['faltam'] ?? 0,
                         Icons.person_outline_rounded,
                         Colors.orange.shade800,
+                        'PENDENTES',
                       ),
                     ],
                   ),
@@ -387,6 +409,176 @@ class _TicketmanResumoEventoPageState extends State<TicketmanResumoEventoPage> {
                 ],
               ),
             ),
+    );
+  }
+}
+
+class TicketmanIngressosEventoPage extends StatefulWidget {
+  final int eventoId;
+  final String situacao;
+
+  const TicketmanIngressosEventoPage({
+    super.key,
+    required this.eventoId,
+    required this.situacao,
+  });
+
+  @override
+  State<TicketmanIngressosEventoPage> createState() =>
+      _TicketmanIngressosEventoPageState();
+}
+
+class _TicketmanIngressosEventoPageState
+    extends State<TicketmanIngressosEventoPage> {
+  Map<String, dynamic>? _resposta;
+  String? _erro;
+  bool _carregando = true;
+
+  String get _titulo => switch (widget.situacao) {
+    'VALIDADOS' => 'Ingressos validados',
+    'PENDENTES' => 'Ingressos pendentes',
+    _ => 'Ingressos vendidos',
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    _carregar();
+  }
+
+  Future<void> _carregar() async {
+    setState(() {
+      _carregando = true;
+      _erro = null;
+    });
+    try {
+      final resposta = await ApiService.listarIngressosEventoTicketman(
+        widget.eventoId,
+        situacao: widget.situacao,
+      );
+      if (mounted) setState(() => _resposta = resposta);
+    } catch (e) {
+      if (mounted) {
+        setState(() => _erro = e.toString().replaceFirst('Exception: ', ''));
+      }
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
+  }
+
+  String _dataHora(Object? valor) {
+    final data = DateTime.tryParse('${valor ?? ''}');
+    return data == null ? '—' : DateFormat('dd/MM/yyyy HH:mm').format(data);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final itens = (_resposta?['ingressos'] as List? ?? const [])
+        .whereType<Map>()
+        .map((item) => Map<String, dynamic>.from(item))
+        .toList();
+    return Scaffold(
+      backgroundColor: ClubbarColors.fundo,
+      appBar: const ClubbarAppBar(mostrarVoltar: true),
+      body: RefreshIndicator(
+        onRefresh: _carregar,
+        child: _carregando
+            ? const Center(child: CircularProgressIndicator())
+            : _erro != null
+            ? ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 12),
+                  Text(_erro!, textAlign: TextAlign.center),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: _carregar,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Tentar novamente'),
+                  ),
+                ],
+              )
+            : ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  Text(
+                    _titulo,
+                    style: const TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${_resposta?['evento'] ?? ''} • ${itens.length} registro(s)',
+                    style: const TextStyle(
+                      color: ClubbarColors.textoSecundario,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  if (itens.isEmpty)
+                    const Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Text(
+                          'Nenhum ingresso encontrado nesta situação.',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  for (final item in itens)
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  item['validado'] == true
+                                      ? Icons.verified_rounded
+                                      : Icons.confirmation_number_outlined,
+                                  color: item['validado'] == true
+                                      ? ClubbarColors.primaria
+                                      : Colors.blue,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '${item['participante']}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ),
+                                if ((item['quantidade'] as num? ?? 1) > 1)
+                                  Chip(
+                                    label: Text(
+                                      '${item['quantidade']} ingressos',
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text('Cliente: ${item['cliente']}'),
+                            if ('${item['cpf_participante']}'.isNotEmpty)
+                              Text('CPF: ${item['cpf_participante']}'),
+                            Text('Lote: ${item['lote']} • ${item['setor']}'),
+                            Text('Modalidade: ${item['modalidade']}'),
+                            Text('Compra: ${_dataHora(item['data_compra'])}'),
+                            if (item['validado'] == true)
+                              Text(
+                                'Validado: ${_dataHora(item['data_validacao'])}',
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+      ),
     );
   }
 }

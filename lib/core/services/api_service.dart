@@ -423,6 +423,25 @@ class ApiService {
     return Map<String, dynamic>.from(corpo as Map);
   }
 
+  static Future<Map<String, dynamic>> listarIngressosEventoTicketman(
+    int eventoId, {
+    required String situacao,
+  }) async {
+    final response = await get(
+      '/eventos/$eventoId/leitor-ingressos?'
+      'situacao=${Uri.encodeQueryComponent(situacao)}',
+    );
+    final texto = response.body.trim();
+    final corpo = texto.isEmpty ? <String, dynamic>{} : jsonDecode(texto);
+    if (response.statusCode != 200) {
+      final detalhe = corpo is Map ? corpo['detail']?.toString() : null;
+      throw Exception(
+        detalhe ?? 'Não foi possível carregar os ingressos do evento.',
+      );
+    }
+    return Map<String, dynamic>.from(corpo as Map);
+  }
+
   static Future<Map<String, dynamic>> buscarLojaDoUsuario({
     required int usuarioId,
   }) async {
